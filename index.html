@@ -62,7 +62,7 @@
       <div id="authLoggedIn" class="hidden items-center gap-2">
         <span class="user-chip hidden sm:inline-flex" id="userChip">
           <svg class="w-3.5 h-3.5 shrink-0" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M10 9a3 3 0 100-6 3 3 0 000 6zm-7 9a7 7 0 1114 0H3z" clip-rule="evenodd"/></svg>
-          <span id="userNameLabel">Utente</span>
+          <span id="userEmailLabel">Utente</span>
         </span>
         <button type="button" onclick="openAdminPanel()" class="bg-amber-500/90 hover:bg-amber-400 text-slate-950 font-black px-3 py-1.5 rounded-lg transition text-[11px] font-orbitron cursor-pointer shadow-lg shadow-amber-500/15" title="Pannello Admin">⚙️ Admin</button>
         <button type="button" onclick="logout()" class="text-slate-400 hover:text-red-400 text-xs font-semibold px-2 py-1.5 transition" title="Esci">Esci</button>
@@ -134,9 +134,7 @@
   <div class="section-divider mb-16 md:mb-20"></div>
   <div class="text-center mb-14"><span class="text-sky-400 font-orbitron uppercase tracking-[0.2em] text-xs font-semibold">I Protagonisti</span><h2 class="text-3xl md:text-5xl font-black mt-2 font-orbitron tracking-tight">L'Equipaggio YUMA</h2><p class="text-slate-400 mt-2 text-sm md:text-base">Gli skipper storici e attuali che compongono il nostro team.</p></div>
   <div class="grid sm:grid-cols-2 lg:grid-cols-3 gap-6" id="roster-container">
-    <div class="glass-card p-6 rounded-2xl text-center flex flex-col items-center"><div class="w-20 h-20 bg-gradient-to-br from-sky-500/25 to-sky-700/20 rounded-full flex items-center justify-center border border-sky-400/40 text-sky-300 font-orbitron text-2xl font-bold mb-4 avatar-ring">YM</div><h3 class="text-xl font-bold font-orbitron text-white" id="m1-name">Skipper Founder</h3><span class="text-amber-400 text-[11px] uppercase tracking-wider font-semibold mb-2" id="m1-role">Timoniere & Fondatore</span><p class="text-slate-400 text-xs leading-relaxed" id="m1-desc">Presente dal 2001. Specialista in partenze e tattica di regata.</p></div>
-    <div class="glass-card p-6 rounded-2xl text-center flex flex-col items-center"><div class="w-20 h-20 bg-gradient-to-br from-amber-500/25 to-amber-700/20 rounded-full flex items-center justify-center border border-amber-400/40 text-amber-300 font-orbitron text-2xl font-bold mb-4 avatar-ring">YM</div><h3 class="text-xl font-bold font-orbitron text-white" id="m2-name">Tactical Master</h3><span class="text-sky-400 text-[11px] uppercase tracking-wider font-semibold mb-2" id="m2-role">Tattico di Bordo</span><p class="text-slate-400 text-xs leading-relaxed" id="m2-desc">Esperto di lettura dei salti di vento e rotte di regata.</p></div>
-    <div class="glass-card p-6 rounded-2xl text-center flex flex-col items-center sm:col-span-2 lg:col-span-1"><div class="w-20 h-20 bg-gradient-to-br from-blue-500/25 to-blue-700/20 rounded-full flex items-center justify-center border border-blue-400/40 text-blue-300 font-orbitron text-2xl font-bold mb-4 avatar-ring">YM</div><h3 class="text-xl font-bold font-orbitron text-white" id="m3-name">Senior Navigator</h3><span class="text-sky-400 text-[11px] uppercase tracking-wider font-semibold mb-2" id="m3-role">Navigatore / Tailer</span><p class="text-slate-400 text-xs leading-relaxed" id="m3-desc">Coordinatore delle manovre e gestione spinnaker nelle poppe.</p></div>
+    <p class="text-slate-500 text-sm col-span-full text-center">Caricamento equipaggio...</p>
   </div>
 </section>
 
@@ -173,7 +171,6 @@
       <button type="submit" id="loginBtn" class="btn-primary w-full mt-2">Entra</button>
     </form>
     <p class="text-center text-slate-500 text-xs mt-5">Accesso riservato ai membri del team YUMA</p>
-    <p class="text-center text-slate-600 text-[10px] mt-2 leading-relaxed px-2">Crea l'utente in Supabase → Authentication → Users → Add user (Auto Confirm attivo).</p>
   </div>
 </div>
 
@@ -192,16 +189,23 @@
       <button type="button" onclick="showAdminTab('system')" id="tab-system" class="admin-tab px-3 py-1.5 rounded-lg bg-slate-800/60 text-slate-400 border border-slate-700">Sistema</button>
     </div>
     <div id="adminTab-content" class="space-y-4 text-left">
-      <div class="bg-sky-500/10 border border-sky-500/25 p-3 rounded-lg text-sky-300 text-xs">Modifica i testi. Poi <strong>Salva</strong> (Supabase).</div>
+      <div class="bg-sky-500/10 border border-sky-500/25 p-3 rounded-lg text-sky-300 text-xs">Modifica i testi. Poi <strong>Salva</strong>.</div>
       <div><label class="block text-[11px] text-slate-400 mb-1 uppercase tracking-wider">Titolo Team</label><input type="text" id="inp-title" class="auth-input text-sm"></div>
       <div><label class="block text-[11px] text-slate-400 mb-1 uppercase tracking-wider">Slogan</label><input type="text" id="inp-slogan" class="auth-input text-sm"></div>
       <div><label class="block text-[11px] text-slate-400 mb-1 uppercase tracking-wider">Sottotitolo hero</label><input type="text" id="inp-subtext" class="auth-input text-sm"></div>
       <div><label class="block text-[11px] text-sky-400 mb-1 uppercase tracking-wider font-semibold">URL sfondo Home</label><input type="text" id="inp-bg" class="auth-input text-xs"></div>
     </div>
     <div id="adminTab-roster" class="space-y-4 text-left hidden">
-      <div class="border border-slate-800 rounded-xl p-3 space-y-2"><h4 class="text-amber-400 font-bold text-[11px] uppercase tracking-wider">Membro 1</h4><input type="text" id="inp-m1-name" placeholder="Nome" class="auth-input text-xs"><input type="text" id="inp-m1-role" placeholder="Ruolo" class="auth-input text-xs"><input type="text" id="inp-m1-desc" placeholder="Descrizione" class="auth-input text-xs"></div>
-      <div class="border border-slate-800 rounded-xl p-3 space-y-2"><h4 class="text-amber-400 font-bold text-[11px] uppercase tracking-wider">Membro 2</h4><input type="text" id="inp-m2-name" placeholder="Nome" class="auth-input text-xs"><input type="text" id="inp-m2-role" placeholder="Ruolo" class="auth-input text-xs"><input type="text" id="inp-m2-desc" placeholder="Descrizione" class="auth-input text-xs"></div>
-      <div class="border border-slate-800 rounded-xl p-3 space-y-2"><h4 class="text-amber-400 font-bold text-[11px] uppercase tracking-wider">Membro 3</h4><input type="text" id="inp-m3-name" placeholder="Nome" class="auth-input text-xs"><input type="text" id="inp-m3-role" placeholder="Ruolo" class="auth-input text-xs"><input type="text" id="inp-m3-desc" placeholder="Descrizione" class="auth-input text-xs"></div>
+      <div class="bg-sky-500/10 border border-sky-500/25 p-3 rounded-lg text-sky-300 text-xs">Aggiungi, modifica o elimina membri. Foto = URL immagine (link diretto .jpg/.png).</div>
+      <div id="adminMembersList" class="space-y-3 max-h-64 overflow-y-auto"></div>
+      <div class="border border-amber-500/30 rounded-xl p-3 space-y-2 bg-amber-500/5">
+        <h4 class="text-amber-400 font-bold text-[11px] uppercase tracking-wider">Nuovo membro</h4>
+        <input type="text" id="new-m-name" placeholder="Nome" class="auth-input text-xs">
+        <input type="text" id="new-m-role" placeholder="Ruolo (es. Timoniere)" class="auth-input text-xs">
+        <input type="text" id="new-m-desc" placeholder="Breve descrizione" class="auth-input text-xs">
+        <input type="url" id="new-m-img" placeholder="URL foto (opzionale)" class="auth-input text-xs">
+        <button type="button" onclick="addMember()" class="btn-secondary text-xs w-full py-2">+ Aggiungi membro</button>
+      </div>
     </div>
     <div id="adminTab-system" class="space-y-4 text-left hidden">
       <div class="bg-slate-800/50 border border-slate-700 rounded-xl p-4 text-sm text-slate-300 space-y-2">
@@ -215,7 +219,7 @@
       <button type="button" onclick="logout(); closeAdminPanel();" class="w-full text-left px-4 py-2.5 rounded-xl border border-red-500/30 text-red-300 hover:bg-red-500/10 text-sm font-semibold transition">Esci dall'account</button>
     </div>
     <div class="flex justify-between items-center border-t border-slate-800 pt-4 mt-5">
-      <button type="button" onclick="saveChanges()" class="btn-primary text-sm px-5 py-2">Salva Modifiche</button>
+      <button type="button" onclick="saveChanges()" class="btn-primary text-sm px-5 py-2">Salva Testi</button>
       <button type="button" onclick="closeAdminPanel()" class="text-slate-400 hover:text-white text-xs cursor-pointer">Chiudi</button>
     </div>
   </div>
@@ -227,81 +231,64 @@
   <p class="text-slate-600 text-xs mt-3">25 Anni in Rotta Insieme</p>
 </footer>
 
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
 <script>
+/* YUMA – auth + members dinamici */
 const SUPABASE_URL = 'https://eefszkqpfwwxoljauobs.supabase.co';
 const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImVlZnN6a3FwZnd3eG9samF1b2JzIiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTMzNjI4MTMsImV4cCI6MjEwODkzODgxM30.xak6904GHCnq4LSJsfNdNGGZeNa7ObRsV6NhfyFE2Zs';
-let supabaseClient = null;
-let currentUser = null;
-let isAdmin = false;
+let supabaseClient = null, currentUser = null, isAdmin = false, membersCache = [];
 try {
-  if (window.supabase && typeof window.supabase.createClient === 'function') {
+  if (window.supabase && window.supabase.createClient)
     supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
-  } else {
-    console.error('Supabase SDK non trovato');
-  }
-} catch (e) { console.error('Errore init Supabase', e); }
+} catch (e) { console.error(e); }
 
+function escapeHtml(s) {
+  return String(s || '').replace(/&/g,'&').replace(/</g,'<').replace(/>/g,'>').replace(/"/g,'"');
+}
 function openLoginModal() {
-  const m = document.getElementById('loginModal');
-  if (!m) return;
-  m.classList.remove('hidden');
-  m.classList.add('flex');
-  const err = document.getElementById('loginError');
-  const loading = document.getElementById('loginLoading');
-  const form = document.getElementById('loginForm');
-  const btn = document.getElementById('loginBtn');
-  if (err) err.classList.add('hidden');
-  if (loading) loading.classList.add('hidden');
-  if (form) form.reset();
-  if (btn) btn.disabled = false;
+  var m = document.getElementById('loginModal'); if (!m) return;
+  m.classList.remove('hidden'); m.classList.add('flex');
+  var err = document.getElementById('loginError'), loading = document.getElementById('loginLoading');
+  var form = document.getElementById('loginForm'), btn = document.getElementById('loginBtn');
+  if (err) err.classList.add('hidden'); if (loading) loading.classList.add('hidden');
+  if (form) form.reset(); if (btn) btn.disabled = false;
   setTimeout(function(){ var el = document.getElementById('loginEmail'); if (el) el.focus(); }, 100);
 }
 function closeLoginModal() {
-  var m = document.getElementById('loginModal');
-  if (!m) return;
-  m.classList.add('hidden');
-  m.classList.remove('flex');
+  var m = document.getElementById('loginModal'); if (!m) return;
+  m.classList.add('hidden'); m.classList.remove('flex');
 }
 function closeAdminPanel() {
-  var m = document.getElementById('adminModal');
-  if (!m) return;
-  m.classList.add('hidden');
-  m.classList.remove('flex');
+  var m = document.getElementById('adminModal'); if (!m) return;
+  m.classList.add('hidden'); m.classList.remove('flex');
 }
-function toggleMenu() {
-  var menu = document.getElementById('mobileMenu');
-  if (menu) menu.classList.toggle('open');
-}
+function toggleMenu() { var menu = document.getElementById('mobileMenu'); if (menu) menu.classList.toggle('open'); }
 function showAdminTab(name) {
   ['content','roster','system'].forEach(function(t) {
-    var tab = document.getElementById('adminTab-' + t);
-    var btn = document.getElementById('tab-' + t);
+    var tab = document.getElementById('adminTab-' + t), btn = document.getElementById('tab-' + t);
     if (tab) tab.classList.toggle('hidden', t !== name);
     if (btn) btn.className = t === name
       ? 'admin-tab px-3 py-1.5 rounded-lg bg-sky-500/20 text-sky-300 border border-sky-500/30'
       : 'admin-tab px-3 py-1.5 rounded-lg bg-slate-800/60 text-slate-400 border border-slate-700';
   });
+  if (name === 'roster') renderAdminMembers();
+  if (name === 'system') loadCandidatureList();
 }
-function escapeHtml(s) {
-  return String(s || '').replace(/&/g,'&').replace(/</g,'<').replace(/>/g,'>').replace(/"/g,'"');
-}
+
 async function initAuth() {
   if (!supabaseClient) return;
   try {
     var res = await supabaseClient.auth.getSession();
     currentUser = (res.data && res.data.session && res.data.session.user) || null;
-    await refreshAdminFlag();
-    updateAuthUI();
+    await refreshAdminFlag(); updateAuthUI();
     supabaseClient.auth.onAuthStateChange(async function(_e, session) {
       currentUser = (session && session.user) || null;
-      await refreshAdminFlag();
-      updateAuthUI();
+      await refreshAdminFlag(); updateAuthUI();
     });
-  } catch (e) { console.error('initAuth', e); }
+  } catch (e) { console.error(e); }
 }
 async function refreshAdminFlag() {
-  isAdmin = false;
-  if (!currentUser || !supabaseClient) return;
+  isAdmin = false; if (!currentUser || !supabaseClient) return;
   try {
     var res = await supabaseClient.from('profiles').select('role').eq('id', currentUser.id).maybeSingle();
     if (!res.error && res.data && res.data.role === 'admin') { isAdmin = true; return; }
@@ -309,143 +296,192 @@ async function refreshAdminFlag() {
   if ((currentUser.email || '').toLowerCase() === 'klaus68@hotmail.it') isAdmin = true;
 }
 function updateAuthUI() {
-  var loggedOut = document.getElementById('authLoggedOut');
-  var loggedIn = document.getElementById('authLoggedIn');
-  var mobOut = document.getElementById('mobileAuthOut');
-  var mobIn = document.getElementById('mobileAuthIn');
+  var loggedOut = document.getElementById('authLoggedOut'), loggedIn = document.getElementById('authLoggedIn');
+  var mobOut = document.getElementById('mobileAuthOut'), mobIn = document.getElementById('mobileAuthIn');
   if (!loggedOut || !loggedIn) return;
   if (currentUser) {
     loggedOut.classList.add('hidden'); loggedOut.classList.remove('flex');
     loggedIn.classList.remove('hidden'); loggedIn.classList.add('flex');
-    if (mobOut) mobOut.classList.add('hidden');
-    if (mobIn) mobIn.classList.remove('hidden');
-    var label = document.getElementById('userNameLabel');
+    if (mobOut) mobOut.classList.add('hidden'); if (mobIn) mobIn.classList.remove('hidden');
+    var label = document.getElementById('userEmailLabel');
     if (label) label.textContent = currentUser.email || 'Utente';
-    document.querySelectorAll('[onclick*="openAdminPanel"]').forEach(function(b) {
-      b.style.display = isAdmin ? '' : 'none';
-    });
+    document.querySelectorAll('[onclick*="openAdminPanel"]').forEach(function(b) { b.style.display = isAdmin ? '' : 'none'; });
   } else {
     loggedOut.classList.remove('hidden'); loggedOut.classList.add('flex');
     loggedIn.classList.add('hidden'); loggedIn.classList.remove('flex');
-    if (mobOut) mobOut.classList.remove('hidden');
-    if (mobIn) mobIn.classList.add('hidden');
+    if (mobOut) mobOut.classList.remove('hidden'); if (mobIn) mobIn.classList.add('hidden');
   }
 }
 async function handleLogin(e) {
   e.preventDefault();
   var email = document.getElementById('loginEmail').value.trim();
   var password = document.getElementById('loginPass').value;
-  var errBox = document.getElementById('loginError');
-  var loading = document.getElementById('loginLoading');
-  var btn = document.getElementById('loginBtn');
-  if (errBox) errBox.classList.add('hidden');
-  if (loading) loading.classList.remove('hidden');
-  if (btn) btn.disabled = true;
+  var errBox = document.getElementById('loginError'), loading = document.getElementById('loginLoading'), btn = document.getElementById('loginBtn');
+  if (errBox) errBox.classList.add('hidden'); if (loading) loading.classList.remove('hidden'); if (btn) btn.disabled = true;
   if (!supabaseClient) {
-    if (loading) loading.classList.add('hidden');
-    if (btn) btn.disabled = false;
+    if (loading) loading.classList.add('hidden'); if (btn) btn.disabled = false;
     if (errBox) { errBox.textContent = 'Supabase non disponibile. Ricarica (Ctrl+F5).'; errBox.classList.remove('hidden'); }
     return;
   }
   try {
     var res = await supabaseClient.auth.signInWithPassword({ email: email, password: password });
-    if (loading) loading.classList.add('hidden');
-    if (btn) btn.disabled = false;
+    if (loading) loading.classList.add('hidden'); if (btn) btn.disabled = false;
     if (res.error) {
-      var msg = (res.error.message || '').toLowerCase();
-      var text = res.error.message || 'Accesso non riuscito.';
-      if (msg.indexOf('invalid login') >= 0 || res.error.code === 'invalid_credentials') {
-        text = 'Email o password non validi. Crea l\'utente in Supabase → Authentication → Users → Add user.';
-      } else if (msg.indexOf('email not confirmed') >= 0 || res.error.code === 'email_not_confirmed') {
-        text = 'Email non confermata. Conferma l\'utente in Authentication → Users.';
-      }
+      var msg = (res.error.message || '').toLowerCase(), text = res.error.message || 'Accesso non riuscito.';
+      if (msg.indexOf('invalid login') >= 0) text = 'Email o password non validi. Crea l\'utente in Supabase → Authentication → Users.';
+      else if (msg.indexOf('email not confirmed') >= 0) text = 'Email non confermata.';
       if (errBox) { errBox.textContent = text; errBox.classList.remove('hidden'); }
-      console.error('Login error', res.error);
       return;
     }
-    currentUser = res.data.user;
-    await refreshAdminFlag();
-    closeLoginModal();
-    updateAuthUI();
+    currentUser = res.data.user; await refreshAdminFlag(); closeLoginModal(); updateAuthUI();
   } catch (err) {
-    if (loading) loading.classList.add('hidden');
-    if (btn) btn.disabled = false;
-    if (errBox) { errBox.textContent = 'Errore di rete: ' + (err.message || err); errBox.classList.remove('hidden'); }
-    console.error(err);
+    if (loading) loading.classList.add('hidden'); if (btn) btn.disabled = false;
+    if (errBox) { errBox.textContent = 'Errore: ' + (err.message || err); errBox.classList.remove('hidden'); }
   }
 }
 async function logout() {
   if (supabaseClient) await supabaseClient.auth.signOut();
-  currentUser = null; isAdmin = false;
-  updateAuthUI();
-  closeAdminPanel();
+  currentUser = null; isAdmin = false; updateAuthUI(); closeAdminPanel();
 }
+
 function openAdminPanel() {
   if (!currentUser) { openLoginModal(); return; }
   if (!isAdmin) { alert('Nessun permesso admin.'); return; }
   function set(id, val) { var el = document.getElementById(id); if (el) el.value = val; }
   function txt(id) { var el = document.getElementById(id); return el ? el.innerText : ''; }
   set('inp-title', txt('hero-title'));
-  set('inp-slogan', txt('hero-slogan').replace(/[“”"]/g, ''));
+  set('inp-slogan', txt('hero-slogan').replace(/[\u201C\u201D"]/g, ''));
   set('inp-subtext', txt('hero-subtext'));
-  set('inp-m1-name', txt('m1-name')); set('inp-m1-role', txt('m1-role')); set('inp-m1-desc', txt('m1-desc'));
-  set('inp-m2-name', txt('m2-name')); set('inp-m2-role', txt('m2-role')); set('inp-m2-desc', txt('m2-desc'));
-  set('inp-m3-name', txt('m3-name')); set('inp-m3-role', txt('m3-role')); set('inp-m3-desc', txt('m3-desc'));
-  var info = document.getElementById('adminUserInfo');
-  var sys = document.getElementById('sysEmail');
+  var info = document.getElementById('adminUserInfo'), sys = document.getElementById('sysEmail');
   if (info) info.textContent = currentUser.email || '';
   if (sys) sys.textContent = currentUser.email || '—';
   showAdminTab('content');
   var m = document.getElementById('adminModal');
   if (m) { m.classList.remove('hidden'); m.classList.add('flex'); }
-  loadCandidatureList();
 }
 async function saveChanges() {
   if (!currentUser || !isAdmin || !supabaseClient) return;
   function val(id) { var el = document.getElementById(id); return el ? el.value : ''; }
-  var payload = {
-    id: 'main',
-    title: val('inp-title'), slogan: val('inp-slogan'), subtext: val('inp-subtext'),
-    bg_url: val('inp-bg') || null,
-    m1_name: val('inp-m1-name'), m1_role: val('inp-m1-role'), m1_desc: val('inp-m1-desc'),
-    m2_name: val('inp-m2-name'), m2_role: val('inp-m2-role'), m2_desc: val('inp-m2-desc'),
-    m3_name: val('inp-m3-name'), m3_role: val('inp-m3-role'), m3_desc: val('inp-m3-desc'),
-    updated_at: new Date().toISOString(), updated_by: currentUser.id
-  };
+  var payload = { id: 'main', title: val('inp-title'), slogan: val('inp-slogan'), subtext: val('inp-subtext'), bg_url: val('inp-bg') || null, updated_at: new Date().toISOString(), updated_by: currentUser.id };
   var res = await supabaseClient.from('site_content').upsert(payload);
   if (res.error) { alert('Errore: ' + res.error.message); return; }
-  applyContent(payload);
-  closeAdminPanel();
-  alert('Salvato su Supabase.');
+  applyContent(payload); closeAdminPanel(); alert('Testi salvati.');
 }
 function applyContent(data) {
   if (!data) return;
   function setText(id, v) { var el = document.getElementById(id); if (el && v != null) el.innerText = v; }
   if (data.title) { setText('hero-title', data.title); setText('nav-logo', data.title); }
-  if (data.slogan) setText('hero-slogan', '“' + data.slogan + '”');
+  if (data.slogan) setText('hero-slogan', '\u201C' + data.slogan + '\u201D');
   if (data.subtext) setText('hero-subtext', data.subtext);
   if (data.bg_url) {
     var home = document.getElementById('home');
     if (home) home.style.backgroundImage = "linear-gradient(to bottom, rgba(2,6,23,0.65) 0%, rgba(2,6,23,0.88) 55%, rgba(2,6,23,0.98) 100%), url('" + data.bg_url + "')";
   }
-  if (data.m1_name) setText('m1-name', data.m1_name);
-  if (data.m1_role) setText('m1-role', data.m1_role);
-  if (data.m1_desc) setText('m1-desc', data.m1_desc);
-  if (data.m2_name) setText('m2-name', data.m2_name);
-  if (data.m2_role) setText('m2-role', data.m2_role);
-  if (data.m2_desc) setText('m2-desc', data.m2_desc);
-  if (data.m3_name) setText('m3-name', data.m3_name);
-  if (data.m3_role) setText('m3-role', data.m3_role);
-  if (data.m3_desc) setText('m3-desc', data.m3_desc);
 }
 async function loadContentFromSupabase() {
   if (!supabaseClient) return;
   try {
     var res = await supabaseClient.from('site_content').select('*').eq('id', 'main').maybeSingle();
-    if (res.error) { console.warn(res.error.message); return; }
-    if (res.data) applyContent(res.data);
-  } catch (e) { console.warn(e); }
+    if (!res.error && res.data) applyContent(res.data);
+  } catch (e) {}
 }
+
+var AVATAR_COLORS = ['from-sky-500/25 to-sky-700/20 border-sky-400/40 text-sky-300','from-amber-500/25 to-amber-700/20 border-amber-400/40 text-amber-300','from-blue-500/25 to-blue-700/20 border-blue-400/40 text-blue-300','from-emerald-500/25 to-emerald-700/20 border-emerald-400/40 text-emerald-300','from-violet-500/25 to-violet-700/20 border-violet-400/40 text-violet-300','from-rose-500/25 to-rose-700/20 border-rose-400/40 text-rose-300'];
+function memberInitials(name) {
+  var parts = String(name || 'YM').trim().split(/\s+/);
+  if (parts.length >= 2) return (parts[0][0] + parts[1][0]).toUpperCase();
+  return (parts[0] || 'YM').slice(0, 2).toUpperCase();
+}
+function renderRoster() {
+  var box = document.getElementById('roster-container'); if (!box) return;
+  if (!membersCache.length) {
+    box.innerHTML = '<p class="text-slate-500 text-sm col-span-full text-center">Nessun membro. Aggiungili dal pannello Admin (tab Equipaggio).</p>';
+    return;
+  }
+  box.innerHTML = membersCache.map(function(m, i) {
+    var colors = AVATAR_COLORS[i % AVATAR_COLORS.length];
+    var roleClass = i % 2 === 0 ? 'text-amber-400' : 'text-sky-400';
+    var avatar;
+    if (m.image_url) {
+      avatar = '<img src="' + escapeHtml(m.image_url) + '" alt="' + escapeHtml(m.name) + '" class="w-20 h-20 rounded-full object-cover border border-sky-400/40 mb-4 avatar-ring" onerror="this.style.display=\'none\';this.nextElementSibling.style.display=\'flex\'">' +
+        '<div class="w-20 h-20 bg-gradient-to-br ' + colors + ' rounded-full items-center justify-center border font-orbitron text-2xl font-bold mb-4 avatar-ring" style="display:none">' + escapeHtml(memberInitials(m.name)) + '</div>';
+    } else {
+      avatar = '<div class="w-20 h-20 bg-gradient-to-br ' + colors + ' rounded-full flex items-center justify-center border font-orbitron text-2xl font-bold mb-4 avatar-ring">' + escapeHtml(memberInitials(m.name)) + '</div>';
+    }
+    return '<div class="glass-card p-6 rounded-2xl text-center flex flex-col items-center">' + avatar +
+      '<h3 class="text-xl font-bold font-orbitron text-white">' + escapeHtml(m.name) + '</h3>' +
+      '<span class="' + roleClass + ' text-[11px] uppercase tracking-wider font-semibold mb-2">' + escapeHtml(m.role || '') + '</span>' +
+      '<p class="text-slate-400 text-xs leading-relaxed">' + escapeHtml(m.description || '') + '</p></div>';
+  }).join('');
+}
+async function loadMembers() {
+  if (!supabaseClient) return;
+  try {
+    var res = await supabaseClient.from('members').select('*').order('sort_order', { ascending: true }).order('id', { ascending: true });
+    membersCache = res.error ? [] : (res.data || []);
+  } catch (e) { membersCache = []; }
+  renderRoster();
+}
+function renderAdminMembers() {
+  var box = document.getElementById('adminMembersList'); if (!box) return;
+  if (!membersCache.length) { box.innerHTML = '<p class="text-slate-500 text-xs">Nessun membro. Aggiungine uno sotto.</p>'; return; }
+  box.innerHTML = membersCache.map(function(m) {
+    return '<div class="border border-slate-700 rounded-xl p-3 space-y-2" data-id="' + m.id + '">' +
+      '<div class="flex gap-2 items-start">' +
+        (m.image_url ? '<img src="' + escapeHtml(m.image_url) + '" class="w-12 h-12 rounded-full object-cover border border-slate-600 shrink-0" alt="">' :
+          '<div class="w-12 h-12 rounded-full bg-slate-700 flex items-center justify-center text-xs font-bold text-slate-300 shrink-0">' + escapeHtml(memberInitials(m.name)) + '</div>') +
+        '<div class="flex-1 space-y-1.5 min-w-0">' +
+          '<input type="text" value="' + escapeHtml(m.name) + '" data-field="name" class="auth-input text-xs" placeholder="Nome">' +
+          '<input type="text" value="' + escapeHtml(m.role || '') + '" data-field="role" class="auth-input text-xs" placeholder="Ruolo">' +
+          '<input type="text" value="' + escapeHtml(m.description || '') + '" data-field="description" class="auth-input text-xs" placeholder="Descrizione">' +
+          '<input type="url" value="' + escapeHtml(m.image_url || '') + '" data-field="image_url" class="auth-input text-xs" placeholder="URL foto">' +
+          '<input type="number" value="' + (m.sort_order || 0) + '" data-field="sort_order" class="auth-input text-xs" placeholder="Ordine">' +
+        '</div></div>' +
+      '<div class="flex gap-2">' +
+        '<button type="button" onclick="saveMember(' + m.id + ')" class="btn-secondary text-[11px] px-3 py-1.5 flex-1">Salva</button>' +
+        '<button type="button" onclick="deleteMember(' + m.id + ')" class="text-red-400 hover:text-red-300 text-[11px] px-3 py-1.5 border border-red-500/30 rounded-lg">Elimina</button>' +
+      '</div></div>';
+  }).join('');
+}
+async function addMember() {
+  if (!isAdmin || !supabaseClient) return;
+  var name = (document.getElementById('new-m-name').value || '').trim();
+  var role = (document.getElementById('new-m-role').value || '').trim();
+  var desc = (document.getElementById('new-m-desc').value || '').trim();
+  var img = (document.getElementById('new-m-img').value || '').trim();
+  if (!name) { alert('Inserisci almeno il nome.'); return; }
+  var maxOrder = membersCache.reduce(function(mx, m) { return Math.max(mx, m.sort_order || 0); }, 0);
+  var res = await supabaseClient.from('members').insert({ name: name, role: role, description: desc, image_url: img || null, sort_order: maxOrder + 1 });
+  if (res.error) { alert('Errore: ' + res.error.message); return; }
+  document.getElementById('new-m-name').value = '';
+  document.getElementById('new-m-role').value = '';
+  document.getElementById('new-m-desc').value = '';
+  document.getElementById('new-m-img').value = '';
+  await loadMembers(); renderAdminMembers();
+}
+async function saveMember(id) {
+  if (!isAdmin || !supabaseClient) return;
+  var card = document.querySelector('#adminMembersList [data-id="' + id + '"]'); if (!card) return;
+  var payload = {};
+  card.querySelectorAll('[data-field]').forEach(function(inp) {
+    var f = inp.getAttribute('data-field'), v = inp.value;
+    if (f === 'sort_order') payload[f] = parseInt(v, 10) || 0;
+    else if (f === 'image_url') payload[f] = v.trim() || null;
+    else payload[f] = v.trim();
+  });
+  if (!payload.name) { alert('Il nome è obbligatorio.'); return; }
+  var res = await supabaseClient.from('members').update(payload).eq('id', id);
+  if (res.error) { alert('Errore: ' + res.error.message); return; }
+  await loadMembers(); renderAdminMembers(); alert('Membro aggiornato.');
+}
+async function deleteMember(id) {
+  if (!isAdmin || !supabaseClient) return;
+  if (!confirm('Eliminare questo membro?')) return;
+  var res = await supabaseClient.from('members').delete().eq('id', id);
+  if (res.error) { alert('Errore: ' + res.error.message); return; }
+  await loadMembers(); renderAdminMembers();
+}
+
 async function submitCandidatura(event) {
   event.preventDefault();
   if (!supabaseClient) { alert('Supabase non disponibile'); return; }
@@ -455,8 +491,8 @@ async function submitCandidatura(event) {
   var res = await supabaseClient.from('candidature').insert({ nome: nome, contatto: contatto, messaggio: messaggio || null });
   if (res.error) { alert('Invio non riuscito: ' + res.error.message); return; }
   document.getElementById('candidaturaForm').reset();
-  var successDiv = document.getElementById('candidaturaSuccess');
-  if (successDiv) { successDiv.classList.remove('hidden'); setTimeout(function(){ successDiv.classList.add('hidden'); }, 5000); }
+  var s = document.getElementById('candidaturaSuccess');
+  if (s) { s.classList.remove('hidden'); setTimeout(function(){ s.classList.add('hidden'); }, 5000); }
 }
 async function loadCandidatureList() {
   var box = document.getElementById('candidatureList');
@@ -467,8 +503,7 @@ async function loadCandidatureList() {
   if (!res.data || !res.data.length) { box.innerHTML = '<p class="text-slate-500 text-xs">Nessuna candidatura.</p>'; return; }
   box.innerHTML = res.data.map(function(c) {
     return '<div class="border border-slate-700 rounded-lg p-2.5 text-xs ' + (c.letto ? 'opacity-60' : '') + '">' +
-      '<div class="flex justify-between gap-2"><strong class="text-white">' + escapeHtml(c.nome) + '</strong>' +
-      '<span class="text-slate-500">' + new Date(c.created_at).toLocaleDateString('it-IT') + '</span></div>' +
+      '<div class="flex justify-between gap-2"><strong class="text-white">' + escapeHtml(c.nome) + '</strong><span class="text-slate-500">' + new Date(c.created_at).toLocaleDateString('it-IT') + '</span></div>' +
       '<div class="text-sky-400 mt-0.5">' + escapeHtml(c.contatto) + '</div>' +
       (c.messaggio ? '<p class="text-slate-400 mt-1">' + escapeHtml(c.messaggio) + '</p>' : '') +
       (!c.letto ? '<button type="button" onclick="markCandidaturaLetta(' + c.id + ')" class="mt-1.5 text-amber-400 hover:text-amber-300 text-[11px]">Segna come letta</button>' : '<span class="text-slate-600 text-[11px]">Letta</span>') +
@@ -480,17 +515,17 @@ async function markCandidaturaLetta(id) {
   await supabaseClient.from('candidature').update({ letto: true }).eq('id', id);
   loadCandidatureList();
 }
+
 document.addEventListener('DOMContentLoaded', async function() {
-  var loginModal = document.getElementById('loginModal');
-  var adminModal = document.getElementById('adminModal');
+  var loginModal = document.getElementById('loginModal'), adminModal = document.getElementById('adminModal');
   if (loginModal) loginModal.addEventListener('click', function(e) { if (e.target.id === 'loginModal') closeLoginModal(); });
   if (adminModal) adminModal.addEventListener('click', function(e) { if (e.target.id === 'adminModal') closeAdminPanel(); });
   window.addEventListener('scroll', function() {
-    var nav = document.getElementById('mainNav');
-    if (!nav) return;
+    var nav = document.getElementById('mainNav'); if (!nav) return;
     if (window.scrollY > 40) nav.classList.add('nav-scrolled'); else nav.classList.remove('nav-scrolled');
   });
   await loadContentFromSupabase();
+  await loadMembers();
   await initAuth();
 });
 </script>
