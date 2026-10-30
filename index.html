@@ -173,6 +173,7 @@
       <button type="submit" id="loginBtn" class="btn-primary w-full mt-2">Entra</button>
     </form>
     <p class="text-center text-slate-500 text-xs mt-5">Accesso riservato ai membri del team YUMA</p>
+    <p class="text-center text-slate-600 text-[10px] mt-2 leading-relaxed px-2">L'utente va creato in Supabase → Authentication → Users, con "Auto Confirm User" attivo.</p>
   </div>
 </div>
 
@@ -292,18 +293,46 @@ async function handleLogin(e) {
   const errBox = document.getElementById('loginError');
   const loading = document.getElementById('loginLoading');
   const btn = document.getElementById('loginBtn');
-  errBox.classList.add('hidden'); loading.classList.remove('hidden'); btn.disabled = true;
-  const { data, error } = await supabase.auth.signInWithPassword({ email, password });
-  loading.classList.add('hidden'); btn.disabled = false;
-  if (error) {
-    errBox.textContent = error.message === 'Invalid login credentials' ? 'Email o password non validi.' : error.message;
+  errBox.classList.add('hidden');
+  loading.classList.remove('hidden');
+  btn.disabled = true;
+
+  if (!window.supabase || !supabase) {
+    loading.classList.add('hidden');
+    btn.disabled = false;
+    errBox.textContent = 'Libreria Supabase non caricata. Ricarica la pagina.';
     errBox.classList.remove('hidden');
     return;
   }
-  currentUser = data.user;
-  await refreshAdminFlag();
-  closeLoginModal();
-  updateAuthUI();
+
+  try {
+    const { data, error } = await supabase.auth.signInWithPassword({ email, password });
+    loading.classList.add('hidden');
+    btn.disabled = false;
+    if (error) {
+      const msg = (error.message || '').toLowerCase();
+      if (msg.includes('invalid login') || error.code === 'invalid_credentials') {
+        errBox.textContent = 'Email o password non validi. Controlla di aver creato l\'utente in Supabase → Authentication → Users.';
+      } else if (msg.includes('email not confirmed') || error.code === 'email_not_confirmed') {
+        errBox.textContent = 'Email non confermata. In Supabase: Authentication → Users → il tuo utente → Confirm email (o disattiva "Confirm email" in Auth settings).';
+      } else {
+        errBox.textContent = error.message || 'Accesso non riuscito.';
+      }
+      errBox.classList.remove('hidden');
+      console.error('Login error', error);
+      return;
+    }
+    currentUser = data.user;
+    await refreshAdminFlag();
+    closeLoginModal();
+    updateAuthUI();
+  } catch (err) {
+    loading.classList.add('hidden');
+    btn.disabled = false;
+    errBox.textContent = 'Errore di rete: ' + (err.message || err);
+    errBox.classList.remove('hidden');
+    console.error(err);
+  }
 }
 
 async function logout() {
