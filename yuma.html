@@ -4,315 +4,463 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>YUMA Team | 25 Anni in Rotta Insieme</title>
+  <meta name="description" content="YUMA Team – 25 anni di Virtual Skipper. Amicizia, passione e regate virtuali dal 2001.">
   <script src="https://cdn.tailwindcss.com"></script>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;600;800;900&family=Rajdhani:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@500;700;800;900&family=Rajdhani:wght@400;500;600;700&display=swap" rel="stylesheet">
 
   <style>
+    :root {
+      --sky: #38bdf8;
+      --amber: #f59e0b;
+      --navy: #0b1220;
+      --deep: #020617;
+    }
+
     html { scroll-behavior: smooth; }
+
     body {
       font-family: 'Rajdhani', sans-serif;
-      background: radial-gradient(circle at top, #0f172a 0%, #030712 100%);
-      color: #f3f4f6;
+      background: var(--deep);
+      color: #e2e8f0;
       min-height: 100vh;
       overflow-x: hidden;
     }
+
     h1, h2, h3, h4, .font-orbitron { font-family: 'Orbitron', sans-serif; }
+
+    /* Animated gradient title */
     .yuma-title {
-      background: linear-gradient(180deg, #ffffff 0%, #38bdf8 50%, #1e40af 100%);
+      background: linear-gradient(135deg, #ffffff 0%, #7dd3fc 35%, #38bdf8 55%, #1d4ed8 100%);
       -webkit-background-clip: text;
+      background-clip: text;
       -webkit-text-fill-color: transparent;
-      filter: drop-shadow(0 10px 20px rgba(14, 165, 233, 0.4));
+      filter: drop-shadow(0 8px 24px rgba(56, 189, 248, 0.35));
+      letter-spacing: -0.04em;
     }
+
+    /* Glass cards with better depth */
     .glass-card {
-      background: rgba(15, 23, 42, 0.85);
-      border: 1px solid rgba(56, 189, 248, 0.2);
-      box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.5);
+      background: linear-gradient(145deg, rgba(15, 23, 42, 0.75), rgba(15, 23, 42, 0.55));
+      border: 1px solid rgba(56, 189, 248, 0.15);
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+      box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4), inset 0 1px 0 rgba(255, 255, 255, 0.04);
+      transition: border-color 0.3s ease, box-shadow 0.3s ease, transform 0.3s ease;
     }
+
     .glass-card:hover {
-      border-color: rgba(234, 179, 8, 0.5);
-      box-shadow: 0 8px 32px 0 rgba(234, 179, 8, 0.2);
+      border-color: rgba(245, 158, 11, 0.45);
+      box-shadow: 0 12px 40px rgba(245, 158, 11, 0.12), 0 8px 32px rgba(0, 0, 0, 0.5);
+      transform: translateY(-3px);
+    }
+
+    /* Subtle wave pattern overlay */
+    .wave-bg {
+      background-image:
+        radial-gradient(ellipse 80% 50% at 50% -20%, rgba(56, 189, 248, 0.12), transparent),
+        radial-gradient(ellipse 60% 40% at 80% 100%, rgba(245, 158, 11, 0.06), transparent);
+    }
+
+    /* Timeline connector */
+    .timeline-line {
+      position: relative;
+    }
+    .timeline-line::before {
+      content: '';
+      position: absolute;
+      top: 28px;
+      left: 0;
+      right: 0;
+      height: 2px;
+      background: linear-gradient(90deg, transparent, rgba(56, 189, 248, 0.3), rgba(245, 158, 11, 0.4), rgba(56, 189, 248, 0.3), transparent);
+      z-index: 0;
+    }
+
+    /* Member avatar glow */
+    .avatar-ring {
+      box-shadow: 0 0 0 2px rgba(56, 189, 248, 0.25), 0 0 20px rgba(56, 189, 248, 0.15);
+    }
+
+    /* Nav blur on scroll */
+    .nav-scrolled {
+      background: rgba(2, 6, 23, 0.85) !important;
+      border-bottom-color: rgba(56, 189, 248, 0.15) !important;
+    }
+
+    /* Mobile menu */
+    #mobileMenu {
+      transition: max-height 0.35s ease, opacity 0.3s ease;
+      max-height: 0;
+      opacity: 0;
+      overflow: hidden;
+    }
+    #mobileMenu.open {
+      max-height: 320px;
+      opacity: 1;
+    }
+
+    /* Form focus */
+    input:focus, textarea:focus {
+      outline: none;
+      border-color: rgba(56, 189, 248, 0.5);
+      box-shadow: 0 0 0 3px rgba(56, 189, 248, 0.12);
+    }
+
+    /* Soft fade-in */
+    @keyframes fadeUp {
+      from { opacity: 0; transform: translateY(18px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+    .fade-up {
+      animation: fadeUp 0.7s ease both;
+    }
+    .delay-1 { animation-delay: 0.1s; }
+    .delay-2 { animation-delay: 0.2s; }
+    .delay-3 { animation-delay: 0.3s; }
+
+    /* Gold accent for jubilee */
+    .jubilee-badge {
+      background: linear-gradient(135deg, rgba(245, 158, 11, 0.2), rgba(245, 158, 11, 0.08));
+      border: 1px solid rgba(245, 158, 11, 0.35);
+    }
+
+    /* Section divider */
+    .section-divider {
+      height: 1px;
+      background: linear-gradient(90deg, transparent, rgba(56, 189, 248, 0.2), transparent);
     }
   </style>
 </head>
-<body class="relative">
+<body class="relative wave-bg">
 
   <!-- Navigation -->
-  <nav class="fixed top-0 left-0 w-full z-40 glass-card border-b border-sky-500/10 px-6 py-4">
+  <nav id="mainNav" class="fixed top-0 left-0 w-full z-40 glass-card border-b border-sky-500/10 px-5 py-3.5 transition-all duration-300">
     <div class="max-w-7xl mx-auto flex items-center justify-between">
-      <div class="flex items-center space-x-3">
-        <a href="#home" class="text-3xl font-black tracking-widest text-sky-400 font-orbitron" id="nav-logo">YUMA</a>
-        <span class="bg-amber-500/20 text-amber-400 border border-amber-500/30 text-xs font-semibold px-2.5 py-0.5 rounded-full uppercase tracking-wider">
+      <div class="flex items-center gap-3">
+        <a href="#home" class="text-2xl md:text-3xl font-black tracking-widest text-sky-400 font-orbitron" id="nav-logo">YUMA</a>
+        <span class="jubilee-badge text-amber-400 text-[10px] md:text-xs font-semibold px-2.5 py-0.5 rounded-full uppercase tracking-wider hidden sm:inline-block">
           25th Jubilee
         </span>
       </div>
-      <div class="hidden md:flex space-x-8 font-semibold tracking-wide text-gray-300">
+
+      <!-- Desktop links -->
+      <div class="hidden md:flex items-center gap-7 font-semibold tracking-wide text-slate-300 text-sm">
         <a href="#home" class="hover:text-sky-400 transition">Home</a>
-        <a href="#storia" class="hover:text-sky-400 transition">La Nostra Storia</a>
-        <a href="#trofei" class="hover:text-sky-400 transition">Sala Trofei</a>
+        <a href="#storia" class="hover:text-sky-400 transition">La Storia</a>
+        <a href="#trofei" class="hover:text-sky-400 transition">Trofei</a>
         <a href="#roster" class="hover:text-sky-400 transition">Equipaggio</a>
-        <a href="#unisciti" class="hover:text-amber-400 transition">Unisciti a Noi</a>
+        <a href="#unisciti" class="hover:text-amber-400 transition">Unisciti</a>
       </div>
-      <div class="flex items-center space-x-3">
-        <button onclick="openAdmin()" class="bg-amber-500 hover:bg-amber-400 text-slate-950 font-black px-4 py-2 rounded-lg transition text-xs font-orbitron cursor-pointer shadow-lg shadow-amber-500/20">
-          ⚙️ Admin
+
+      <div class="flex items-center gap-2.5">
+        <button onclick="openAdmin()" class="bg-amber-500/90 hover:bg-amber-400 text-slate-950 font-black px-3 py-1.5 rounded-lg transition text-[11px] font-orbitron cursor-pointer shadow-lg shadow-amber-500/15" title="Admin">
+          ⚙️
         </button>
-        <a href="#unisciti" class="bg-gradient-to-r from-sky-500 to-blue-600 hover:from-sky-400 hover:to-blue-500 text-white font-bold px-4 py-2 rounded-lg transition shadow-lg shadow-sky-500/20 font-orbitron text-sm">
+        <a href="#unisciti" class="hidden sm:inline-flex bg-gradient-to-r from-sky-500 to-blue-600 hover:from-sky-400 hover:to-blue-500 text-white font-bold px-4 py-1.5 rounded-lg transition shadow-lg shadow-sky-500/20 font-orbitron text-xs">
           Candidati
         </a>
+        <!-- Hamburger -->
+        <button id="menuBtn" onclick="toggleMenu()" class="md:hidden text-slate-300 hover:text-white p-1.5" aria-label="Menu">
+          <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"/></svg>
+        </button>
+      </div>
+    </div>
+
+    <!-- Mobile menu -->
+    <div id="mobileMenu" class="md:hidden mt-3 border-t border-slate-800/80">
+      <div class="flex flex-col gap-1 py-3 text-sm font-semibold text-slate-300">
+        <a href="#home" onclick="toggleMenu()" class="px-3 py-2 rounded-lg hover:bg-slate-800/60 hover:text-sky-400">Home</a>
+        <a href="#storia" onclick="toggleMenu()" class="px-3 py-2 rounded-lg hover:bg-slate-800/60 hover:text-sky-400">La Storia</a>
+        <a href="#trofei" onclick="toggleMenu()" class="px-3 py-2 rounded-lg hover:bg-slate-800/60 hover:text-sky-400">Trofei</a>
+        <a href="#roster" onclick="toggleMenu()" class="px-3 py-2 rounded-lg hover:bg-slate-800/60 hover:text-sky-400">Equipaggio</a>
+        <a href="#unisciti" onclick="toggleMenu()" class="px-3 py-2 rounded-lg hover:bg-slate-800/60 hover:text-amber-400">Unisciti a Noi</a>
       </div>
     </div>
   </nav>
 
-  <!-- Hero Section -->
-  <section id="home" class="min-h-screen flex flex-col justify-center items-center text-center pt-28 pb-12 px-4 relative bg-cover bg-center transition-all duration-500" style="background-image: linear-gradient(to bottom, rgba(3, 7, 18, 0.7), rgba(3, 7, 18, 0.95)), url('https://images.unsplash.com/photo-1507525428034-b723cf961d3e?auto=format&fit=crop&w=1920&q=80');">
-    <div class="inline-flex items-center space-x-2 bg-slate-900/90 border border-amber-500/40 rounded-full px-4 py-1.5 mb-6 shadow-md">
-      <span class="text-amber-300 text-sm font-semibold tracking-wide">1999/2001 – 2026: 25 Anni di Virtual Sailing</span>
+  <!-- Hero -->
+  <section id="home" class="min-h-screen flex flex-col justify-center items-center text-center pt-24 pb-16 px-4 relative bg-cover bg-center transition-all duration-500"
+    style="background-image: linear-gradient(to bottom, rgba(2,6,23,0.65) 0%, rgba(2,6,23,0.88) 55%, rgba(2,6,23,0.98) 100%), url('https://images.unsplash.com/photo-1507525428034-b723cf961d3e?auto=format&fit=crop&w=1920&q=80');">
+
+    <div class="fade-up inline-flex items-center gap-2 jubilee-badge rounded-full px-4 py-1.5 mb-5 shadow-md">
+      <span class="w-1.5 h-1.5 rounded-full bg-amber-400 animate-pulse"></span>
+      <span class="text-amber-300 text-xs sm:text-sm font-semibold tracking-wide">1999/2001 – 2026 · 25 Anni di Virtual Sailing</span>
     </div>
 
-    <h1 class="text-7xl sm:text-9xl md:text-[11rem] font-black tracking-tighter yuma-title leading-none select-none my-2" id="hero-title">
+    <h1 class="text-7xl sm:text-8xl md:text-[10rem] font-black tracking-tighter yuma-title leading-none select-none fade-up delay-1" id="hero-title">
       YUMA
     </h1>
 
-    <p class="text-xl md:text-3xl font-bold text-sky-200 mt-4 max-w-3xl font-orbitron" id="hero-slogan">
-      "25 Anni in Rotta Insieme"
+    <p class="text-xl sm:text-2xl md:text-3xl font-bold text-sky-200/95 mt-3 max-w-3xl font-orbitron fade-up delay-2" id="hero-slogan">
+      “25 Anni in Rotta Insieme”
     </p>
-    <p class="text-lg md:text-xl text-slate-300 max-w-2xl mt-2 italic" id="hero-subtext">
-      Un Viaggio di Amicizia, Passione e Cameratismo sui Mari di Virtual Skipper
+    <p class="text-base md:text-lg text-slate-400 max-w-xl mt-2 italic fade-up delay-2" id="hero-subtext">
+      Un viaggio di amicizia, passione e cameratismo sui mari di Virtual Skipper
     </p>
 
-    <div class="flex flex-wrap gap-4 mt-8 justify-center">
-      <a href="#storia" class="bg-amber-500 hover:bg-amber-400 text-slate-950 font-bold px-8 py-3.5 rounded-lg transition font-orbitron shadow-lg shadow-amber-500/20">
+    <div class="flex flex-wrap gap-3 mt-8 justify-center fade-up delay-3">
+      <a href="#storia" class="bg-amber-500 hover:bg-amber-400 text-slate-950 font-bold px-7 py-3 rounded-xl transition font-orbitron shadow-lg shadow-amber-500/25 text-sm">
         Scopri il Viaggio
       </a>
-      <a href="#unisciti" class="glass-card hover:bg-slate-800/80 text-sky-300 font-bold px-8 py-3.5 rounded-lg transition font-orbitron border border-sky-500/30">
+      <a href="#unisciti" class="glass-card hover:bg-slate-800/70 text-sky-300 font-bold px-7 py-3 rounded-xl transition font-orbitron border border-sky-500/25 text-sm">
         Sali a Bordo
       </a>
     </div>
+
+    <!-- Scroll hint -->
+    <div class="absolute bottom-8 left-1/2 -translate-x-1/2 opacity-40 animate-bounce hidden sm:block">
+      <svg class="w-5 h-5 text-sky-300" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 14l-7 7m0 0l-7-7m7 7V3"/></svg>
+    </div>
   </section>
 
-  <!-- Timeline / La Nostra Storia -->
-  <section id="storia" class="py-24 px-6 max-w-7xl mx-auto border-t border-slate-900">
-    <div class="text-center mb-16">
-      <span class="text-sky-400 font-orbitron uppercase tracking-widest text-sm font-semibold">Roadmap Storica</span>
-      <h2 class="text-3xl md:text-5xl font-black mt-2 font-orbitron">25 Anni in Rotta Insieme</h2>
-      <p class="text-slate-400 mt-3 max-w-xl mx-auto">I momenti salienti, le barche storiche e le avventure che hanno unito la nostra community dal 2001 ad oggi.</p>
+  <!-- Timeline -->
+  <section id="storia" class="py-20 md:py-28 px-5 max-w-7xl mx-auto">
+    <div class="section-divider mb-16 md:mb-20"></div>
+    <div class="text-center mb-14">
+      <span class="text-sky-400 font-orbitron uppercase tracking-[0.2em] text-xs font-semibold">Roadmap Storica</span>
+      <h2 class="text-3xl md:text-5xl font-black mt-2 font-orbitron tracking-tight">25 Anni in Rotta Insieme</h2>
+      <p class="text-slate-400 mt-3 max-w-lg mx-auto text-sm md:text-base">I momenti salienti, le barche storiche e le avventure che hanno unito la community dal 2001 a oggi.</p>
     </div>
 
-    <div class="grid md:grid-cols-4 gap-6">
-      <div class="glass-card p-6 rounded-2xl">
-        <div class="text-amber-400 font-orbitron text-4xl font-black mb-2">2001</div>
-        <div class="text-sky-400 text-xs font-semibold uppercase tracking-wider mb-2">VSK1 / VSK2</div>
-        <h3 class="text-xl font-bold text-white mb-2">Pionieri del Mare</h3>
-        <p class="text-slate-300 text-sm leading-relaxed">I primi raduni sui server di Virtual Skipper. Si forma il primo nucleo di amici uniti dalla grande passione per la vela.</p>
+    <div class="grid sm:grid-cols-2 lg:grid-cols-4 gap-5 timeline-line">
+      <div class="glass-card p-6 rounded-2xl relative z-10">
+        <div class="text-amber-400 font-orbitron text-4xl font-black mb-1">2001</div>
+        <div class="text-sky-400/90 text-[11px] font-semibold uppercase tracking-wider mb-2">VSK1 / VSK2</div>
+        <h3 class="text-lg font-bold text-white mb-2">Pionieri del Mare</h3>
+        <p class="text-slate-400 text-sm leading-relaxed">I primi raduni sui server di Virtual Skipper. Nasce il nucleo di amici uniti dalla passione per la vela.</p>
       </div>
 
-      <div class="glass-card p-6 rounded-2xl">
-        <div class="text-amber-400 font-orbitron text-4xl font-black mb-2">2007</div>
-        <div class="text-sky-400 text-xs font-semibold uppercase tracking-wider mb-2">VSK5 ACC</div>
-        <h3 class="text-xl font-bold text-white mb-2">L'Era America's Cup</h3>
-        <p class="text-slate-300 text-sm leading-relaxed">Con i monoscafi ACC32 si consolidano la tattica di flotta e le grandi regate a squadre.</p>
+      <div class="glass-card p-6 rounded-2xl relative z-10">
+        <div class="text-amber-400 font-orbitron text-4xl font-black mb-1">2007</div>
+        <div class="text-sky-400/90 text-[11px] font-semibold uppercase tracking-wider mb-2">VSK5 ACC</div>
+        <h3 class="text-lg font-bold text-white mb-2">L'Era America's Cup</h3>
+        <p class="text-slate-400 text-sm leading-relaxed">Con i monoscafi ACC32 si consolidano tattica di flotta e grandi regate a squadre.</p>
       </div>
 
-      <div class="glass-card p-6 rounded-2xl">
-        <div class="text-amber-400 font-orbitron text-4xl font-black mb-2">2016</div>
-        <div class="text-sky-400 text-xs font-semibold uppercase tracking-wider mb-2">Fleet Race TP52</div>
-        <h3 class="text-xl font-bold text-white mb-2">Passione & Rispetto</h3>
-        <p class="text-slate-300 text-sm leading-relaxed">Campionati italiani e internazionali. YUMA si distingue non solo sui campi di regata virtuali, ma per la lealtà.</p>
+      <div class="glass-card p-6 rounded-2xl relative z-10">
+        <div class="text-amber-400 font-orbitron text-4xl font-black mb-1">2016</div>
+        <div class="text-sky-400/90 text-[11px] font-semibold uppercase tracking-wider mb-2">Fleet Race TP52</div>
+        <h3 class="text-lg font-bold text-white mb-2">Passione & Rispetto</h3>
+        <p class="text-slate-400 text-sm leading-relaxed">Campionati italiani e internazionali. YUMA si distingue per lealtà e fair play.</p>
       </div>
 
-      <div class="glass-card p-6 rounded-2xl border border-amber-500/40 bg-amber-500/10">
-        <div class="text-amber-400 font-orbitron text-4xl font-black mb-2">2026</div>
-        <div class="text-amber-300 text-xs font-semibold uppercase tracking-wider mb-2">25th Jubilee</div>
-        <h3 class="text-xl font-bold text-white mb-2">Un Quarto di Secolo</h3>
-        <p class="text-slate-300 text-sm leading-relaxed">25 anni di risate, serate passate in chiamata e grandi regate.</p>
+      <div class="glass-card p-6 rounded-2xl relative z-10 border border-amber-500/35 bg-amber-500/[0.07]">
+        <div class="text-amber-400 font-orbitron text-4xl font-black mb-1">2026</div>
+        <div class="text-amber-300/90 text-[11px] font-semibold uppercase tracking-wider mb-2">25th Jubilee</div>
+        <h3 class="text-lg font-bold text-white mb-2">Un Quarto di Secolo</h3>
+        <p class="text-slate-400 text-sm leading-relaxed">25 anni di risate, serate in chiamata e grandi regate. Il viaggio continua.</p>
       </div>
     </div>
   </section>
 
   <!-- Sala Trofei -->
-  <section id="trofei" class="py-24 px-6 max-w-7xl mx-auto border-t border-slate-800">
-    <div class="text-center mb-16">
-      <span class="text-amber-400 font-orbitron uppercase tracking-widest text-sm font-semibold">Bacheca della Memoria</span>
-      <h2 class="text-3xl md:text-5xl font-black mt-2 font-orbitron">Sala Trofei & Ricordi</h2>
+  <section id="trofei" class="py-20 md:py-28 px-5 max-w-7xl mx-auto">
+    <div class="section-divider mb-16 md:mb-20"></div>
+    <div class="text-center mb-14">
+      <span class="text-amber-400 font-orbitron uppercase tracking-[0.2em] text-xs font-semibold">Bacheca della Memoria</span>
+      <h2 class="text-3xl md:text-5xl font-black mt-2 font-orbitron tracking-tight">Sala Trofei & Ricordi</h2>
     </div>
 
-    <div class="grid md:grid-cols-3 gap-8">
-      <div class="glass-card p-8 rounded-2xl text-center flex flex-col items-center">
-        <h3 class="text-2xl font-bold font-orbitron text-white">Campionati di Flotta</h3>
-        <p class="text-slate-400 text-sm mt-2">I successi e le targhe conquistate nelle competizioni nazionali e internazionali a squadre nel corso degli anni.</p>
+    <div class="grid md:grid-cols-3 gap-6">
+      <div class="glass-card p-8 rounded-2xl text-center flex flex-col items-center group">
+        <div class="w-14 h-14 rounded-full bg-sky-500/15 border border-sky-400/30 flex items-center justify-center mb-4 text-2xl group-hover:scale-110 transition">🏆</div>
+        <h3 class="text-xl font-bold font-orbitron text-white">Campionati di Flotta</h3>
+        <p class="text-slate-400 text-sm mt-2 leading-relaxed">I successi e le targhe conquistate nelle competizioni nazionali e internazionali a squadre.</p>
       </div>
-      <div class="glass-card p-8 rounded-2xl text-center flex flex-col items-center">
-        <h3 class="text-2xl font-bold font-orbitron text-white">Spirito di Squadra</h3>
-        <p class="text-slate-400 text-sm mt-2">Premi per la correttezza sportiva, il rispetto delle regole di regata e la lealtà in mare.</p>
+      <div class="glass-card p-8 rounded-2xl text-center flex flex-col items-center group">
+        <div class="w-14 h-14 rounded-full bg-amber-500/15 border border-amber-400/30 flex items-center justify-center mb-4 text-2xl group-hover:scale-110 transition">⚓</div>
+        <h3 class="text-xl font-bold font-orbitron text-white">Spirito di Squadra</h3>
+        <p class="text-slate-400 text-sm mt-2 leading-relaxed">Premi per la correttezza sportiva, il rispetto delle regole e la lealtà in mare.</p>
       </div>
-      <div class="glass-card p-8 rounded-2xl text-center flex flex-col items-center">
-        <h3 class="text-2xl font-bold font-orbitron text-white">25 Anni di Amicizia</h3>
-        <p class="text-slate-400 text-sm mt-2">Il trofeo più importante: un gruppo affiatato che dura da un quarto di secolo senza mai perdere la passione.</p>
+      <div class="glass-card p-8 rounded-2xl text-center flex flex-col items-center group">
+        <div class="w-14 h-14 rounded-full bg-blue-500/15 border border-blue-400/30 flex items-center justify-center mb-4 text-2xl group-hover:scale-110 transition">🤝</div>
+        <h3 class="text-xl font-bold font-orbitron text-white">25 Anni di Amicizia</h3>
+        <p class="text-slate-400 text-sm mt-2 leading-relaxed">Il trofeo più importante: un gruppo affiatato che dura da un quarto di secolo.</p>
       </div>
     </div>
   </section>
 
-  <!-- Equipaggio (Roster Stabile in HTML) -->
-  <section id="roster" class="py-24 px-6 max-w-7xl mx-auto border-t border-slate-800">
-    <div class="text-center mb-16">
-      <span class="text-sky-400 font-orbitron uppercase tracking-widest text-sm font-semibold">I Protagonisti</span>
-      <h2 class="text-3xl md:text-5xl font-black mt-2 font-orbitron">L'Equipaggio YUMA</h2>
-      <p class="text-slate-400 mt-2">Gli skipper storici e attuali che compongono il nostro team.</p>
+  <!-- Equipaggio -->
+  <section id="roster" class="py-20 md:py-28 px-5 max-w-7xl mx-auto">
+    <div class="section-divider mb-16 md:mb-20"></div>
+    <div class="text-center mb-14">
+      <span class="text-sky-400 font-orbitron uppercase tracking-[0.2em] text-xs font-semibold">I Protagonisti</span>
+      <h2 class="text-3xl md:text-5xl font-black mt-2 font-orbitron tracking-tight">L'Equipaggio YUMA</h2>
+      <p class="text-slate-400 mt-2 text-sm md:text-base">Gli skipper storici e attuali che compongono il nostro team.</p>
     </div>
 
-    <div class="grid md:grid-cols-3 gap-8" id="roster-container">
+    <div class="grid sm:grid-cols-2 lg:grid-cols-3 gap-6" id="roster-container">
       <div class="glass-card p-6 rounded-2xl text-center flex flex-col items-center">
-        <div class="w-20 h-20 bg-sky-500/20 rounded-full flex items-center justify-center border border-sky-400 text-sky-300 font-orbitron text-2xl font-bold mb-4">YM</div>
+        <div class="w-20 h-20 bg-gradient-to-br from-sky-500/25 to-sky-700/20 rounded-full flex items-center justify-center border border-sky-400/40 text-sky-300 font-orbitron text-2xl font-bold mb-4 avatar-ring">YM</div>
         <h3 class="text-xl font-bold font-orbitron text-white" id="m1-name">Skipper Founder</h3>
-        <span class="text-amber-400 text-xs uppercase tracking-wider font-semibold mb-2" id="m1-role">Timoniere & Fondatore</span>
-        <p class="text-slate-400 text-xs" id="m1-desc">Presente dal 2001. Specialista in partenze e tattica di regata.</p>
+        <span class="text-amber-400 text-[11px] uppercase tracking-wider font-semibold mb-2" id="m1-role">Timoniere & Fondatore</span>
+        <p class="text-slate-400 text-xs leading-relaxed" id="m1-desc">Presente dal 2001. Specialista in partenze e tattica di regata.</p>
       </div>
 
       <div class="glass-card p-6 rounded-2xl text-center flex flex-col items-center">
-        <div class="w-20 h-20 bg-amber-500/20 rounded-full flex items-center justify-center border border-amber-400 text-amber-300 font-orbitron text-2xl font-bold mb-4">YM</div>
+        <div class="w-20 h-20 bg-gradient-to-br from-amber-500/25 to-amber-700/20 rounded-full flex items-center justify-center border border-amber-400/40 text-amber-300 font-orbitron text-2xl font-bold mb-4 avatar-ring">YM</div>
         <h3 class="text-xl font-bold font-orbitron text-white" id="m2-name">Tactical Master</h3>
-        <span class="text-sky-400 text-xs uppercase tracking-wider font-semibold mb-2" id="m2-role">Tattico di Bordo</span>
-        <p class="text-slate-400 text-xs" id="m2-desc">Esperto di lettura dei salti di vento e rotte di regata.</p>
+        <span class="text-sky-400 text-[11px] uppercase tracking-wider font-semibold mb-2" id="m2-role">Tattico di Bordo</span>
+        <p class="text-slate-400 text-xs leading-relaxed" id="m2-desc">Esperto di lettura dei salti di vento e rotte di regata.</p>
       </div>
 
-      <div class="glass-card p-6 rounded-2xl text-center flex flex-col items-center">
-        <div class="w-20 h-20 bg-blue-500/20 rounded-full flex items-center justify-center border border-blue-400 text-blue-300 font-orbitron text-2xl font-bold mb-4">YM</div>
+      <div class="glass-card p-6 rounded-2xl text-center flex flex-col items-center sm:col-span-2 lg:col-span-1">
+        <div class="w-20 h-20 bg-gradient-to-br from-blue-500/25 to-blue-700/20 rounded-full flex items-center justify-center border border-blue-400/40 text-blue-300 font-orbitron text-2xl font-bold mb-4 avatar-ring">YM</div>
         <h3 class="text-xl font-bold font-orbitron text-white" id="m3-name">Senior Navigator</h3>
-        <span class="text-sky-400 text-xs uppercase tracking-wider font-semibold mb-2" id="m3-role">Navigatore / Tailer</span>
-        <p class="text-slate-400 text-xs" id="m3-desc">Coordinatore delle manovre e gestione spinnaker nelle poppe.</p>
+        <span class="text-sky-400 text-[11px] uppercase tracking-wider font-semibold mb-2" id="m3-role">Navigatore / Tailer</span>
+        <p class="text-slate-400 text-xs leading-relaxed" id="m3-desc">Coordinatore delle manovre e gestione spinnaker nelle poppe.</p>
       </div>
     </div>
   </section>
 
-  <!-- Modulo Candidatura -->
-  <section id="unisciti" class="py-24 px-6 max-w-4xl mx-auto border-t border-slate-800">
-    <div class="glass-card p-8 md:p-12 rounded-3xl border border-sky-500/30 relative">
-      <div class="text-center mb-8">
-        <h2 class="text-3xl md:text-4xl font-black font-orbitron">Vuoi Navigare con YUMA?</h2>
-        <p class="text-slate-300 mt-2">Siamo sempre felici di accogliere appassionati di Virtual Skipper. Compila il modulo per metterti in contatto con noi!</p>
+  <!-- Candidatura -->
+  <section id="unisciti" class="py-20 md:py-28 px-5 max-w-3xl mx-auto">
+    <div class="section-divider mb-16 md:mb-20"></div>
+    <div class="glass-card p-8 md:p-11 rounded-3xl border border-sky-500/25 relative overflow-hidden">
+      <!-- decorative glow -->
+      <div class="absolute -top-20 -right-20 w-56 h-56 bg-sky-500/10 rounded-full blur-3xl pointer-events-none"></div>
+
+      <div class="text-center mb-8 relative">
+        <h2 class="text-2xl md:text-4xl font-black font-orbitron tracking-tight">Vuoi Navigare con YUMA?</h2>
+        <p class="text-slate-400 mt-2 text-sm md:text-base">Siamo sempre felici di accogliere appassionati di Virtual Skipper. Compila il modulo!</p>
       </div>
 
-      <form id="candidaturaForm" onsubmit="submitCandidatura(event)" class="space-y-4">
-        <div class="grid md:grid-cols-2 gap-4">
+      <form id="candidaturaForm" onsubmit="submitCandidatura(event)" class="space-y-4 relative">
+        <div class="grid sm:grid-cols-2 gap-4">
           <div>
-            <label class="block text-xs font-semibold text-slate-400 uppercase mb-1">Nome / Nickname VSK</label>
-            <input type="text" id="cand-nome" required placeholder="es. Skipper_99" class="w-full bg-slate-900 border border-slate-700 rounded-lg px-4 py-3 text-white">
+            <label class="block text-[11px] font-semibold text-slate-400 uppercase tracking-wider mb-1.5">Nome / Nickname VSK</label>
+            <input type="text" id="cand-nome" required placeholder="es. Skipper_99" class="w-full bg-slate-900/80 border border-slate-700/80 rounded-xl px-4 py-3 text-white text-sm transition">
           </div>
           <div>
-            <label class="block text-xs font-semibold text-slate-400 uppercase mb-1">Email / Discord</label>
-            <input type="text" id="cand-email" required placeholder="tuo-nome#1234 o email" class="w-full bg-slate-900 border border-slate-700 rounded-lg px-4 py-3 text-white">
+            <label class="block text-[11px] font-semibold text-slate-400 uppercase tracking-wider mb-1.5">Email / Discord</label>
+            <input type="text" id="cand-email" required placeholder="tuo-nome#1234 o email" class="w-full bg-slate-900/80 border border-slate-700/80 rounded-xl px-4 py-3 text-white text-sm transition">
           </div>
         </div>
         <div>
-          <label class="block text-xs font-semibold text-slate-400 uppercase mb-1">Messaggio</label>
-          <textarea id="cand-msg" rows="3" placeholder="Raccontaci qualcosa di te..." class="w-full bg-slate-900 border border-slate-700 rounded-lg px-4 py-3 text-white"></textarea>
+          <label class="block text-[11px] font-semibold text-slate-400 uppercase tracking-wider mb-1.5">Messaggio</label>
+          <textarea id="cand-msg" rows="3" placeholder="Raccontaci qualcosa di te..." class="w-full bg-slate-900/80 border border-slate-700/80 rounded-xl px-4 py-3 text-white text-sm transition resize-none"></textarea>
         </div>
-        <button type="submit" class="w-full bg-amber-500 hover:bg-amber-400 text-slate-950 font-black py-3 rounded-xl font-orbitron transition cursor-pointer">Invia Candidatura</button>
+        <button type="submit" class="w-full bg-amber-500 hover:bg-amber-400 text-slate-950 font-black py-3.5 rounded-xl font-orbitron transition cursor-pointer shadow-lg shadow-amber-500/20 text-sm">
+          Invia Candidatura
+        </button>
       </form>
-      <div id="candidaturaSuccess" class="hidden mt-4 p-4 bg-emerald-500/20 border border-emerald-500/40 rounded-xl text-emerald-300 text-center font-semibold">
+
+      <div id="candidaturaSuccess" class="hidden mt-5 p-4 bg-emerald-500/15 border border-emerald-500/35 rounded-xl text-emerald-300 text-center font-semibold text-sm">
         ⛵ Candidatura inviata con successo! Ti ricontatteremo presto a bordo.
       </div>
     </div>
   </section>
 
-  <!-- MODALE PANNELLO ADMIN -->
-  <div id="adminModal" style="display: none;" class="fixed inset-0 bg-slate-950/85 backdrop-blur-md z-50 flex items-center justify-center p-4">
-    <div class="glass-card max-w-xl w-full p-6 rounded-2xl border border-sky-500/40 relative max-h-[90vh] overflow-y-auto">
-      <div class="flex justify-between items-center mb-6 border-b border-slate-800 pb-3">
-        <h3 class="text-xl font-bold font-orbitron text-sky-400">⚙️ Pannello Admin YUMA</h3>
-        <button onclick="closeAdmin()" class="text-slate-400 hover:text-white font-bold text-2xl cursor-pointer">&times;</button>
+  <!-- Admin Modal -->
+  <div id="adminModal" style="display: none;" class="fixed inset-0 bg-slate-950/90 backdrop-blur-md z-50 flex items-center justify-center p-4">
+    <div class="glass-card max-w-md w-full p-6 rounded-2xl border border-sky-500/35 relative max-h-[90vh] overflow-y-auto">
+      <div class="flex justify-between items-center mb-5 border-b border-slate-800 pb-3">
+        <h3 class="text-lg font-bold font-orbitron text-sky-400">⚙️ Admin YUMA</h3>
+        <button onclick="closeAdmin()" class="text-slate-400 hover:text-white font-bold text-2xl leading-none cursor-pointer">&times;</button>
       </div>
 
-      <!-- Login -->
       <div id="adminLogin">
-        <p class="text-slate-300 text-sm mb-4">Inserisci la password (<strong>yuma2026</strong>):</p>
+        <p class="text-slate-400 text-sm mb-3">Inserisci la password:</p>
         <div class="flex gap-2">
-          <input type="password" id="adminPass" placeholder="Password" class="w-full bg-slate-900 border border-slate-700 rounded-lg px-4 py-2 text-white">
-          <button onclick="loginAdmin()" class="bg-amber-500 hover:bg-amber-400 text-slate-950 font-bold px-5 py-2 rounded-lg font-orbitron cursor-pointer">Accedi</button>
+          <input type="password" id="adminPass" placeholder="Password" class="w-full bg-slate-900 border border-slate-700 rounded-lg px-4 py-2.5 text-white text-sm" onkeydown="if(event.key==='Enter')loginAdmin()">
+          <button onclick="loginAdmin()" class="bg-amber-500 hover:bg-amber-400 text-slate-950 font-bold px-5 py-2.5 rounded-lg font-orbitron cursor-pointer text-sm">Accedi</button>
         </div>
       </div>
 
-      <!-- Controlli Modifica -->
-      <div id="adminControls" style="display: none;" class="space-y-5 text-left">
-        <div class="bg-sky-500/10 border border-sky-500/30 p-3 rounded-lg text-sky-300 text-xs">
-          ⚡ Modifica i campi e clicca su <strong>"Salva Modifiche"</strong>.
+      <div id="adminControls" style="display: none;" class="space-y-4 text-left">
+        <div class="bg-sky-500/10 border border-sky-500/25 p-3 rounded-lg text-sky-300 text-xs">
+          Modifica i campi e clicca <strong>Salva Modifiche</strong>.
         </div>
 
         <div>
-          <label class="block text-xs text-slate-400 mb-1">Titolo Team</label>
-          <input type="text" id="inp-title" class="w-full bg-slate-900 border border-slate-700 rounded px-3 py-2 text-white text-sm">
+          <label class="block text-[11px] text-slate-400 mb-1 uppercase tracking-wider">Titolo Team</label>
+          <input type="text" id="inp-title" class="w-full bg-slate-900 border border-slate-700 rounded-lg px-3 py-2 text-white text-sm">
         </div>
         <div>
-          <label class="block text-xs text-slate-400 mb-1">Slogan</label>
-          <input type="text" id="inp-slogan" class="w-full bg-slate-900 border border-slate-700 rounded px-3 py-2 text-white text-sm">
+          <label class="block text-[11px] text-slate-400 mb-1 uppercase tracking-wider">Slogan</label>
+          <input type="text" id="inp-slogan" class="w-full bg-slate-900 border border-slate-700 rounded-lg px-3 py-2 text-white text-sm">
         </div>
         <div>
-          <label class="block text-xs text-sky-400 mb-1 font-semibold">Link Sfondo Home (URL)</label>
-          <input type="text" id="inp-bg" class="w-full bg-slate-900 border border-slate-700 rounded px-3 py-2 text-white text-xs">
+          <label class="block text-[11px] text-sky-400 mb-1 uppercase tracking-wider font-semibold">Link Sfondo Home (URL)</label>
+          <input type="text" id="inp-bg" class="w-full bg-slate-900 border border-slate-700 rounded-lg px-3 py-2 text-white text-xs">
         </div>
 
-        <div class="border-t border-slate-800 pt-4 space-y-3">
-          <h4 class="text-amber-400 font-bold text-xs uppercase tracking-wider">Modifica Membro 1</h4>
-          <input type="text" id="inp-m1-name" placeholder="Nome" class="w-full bg-slate-900 border border-slate-700 rounded px-2 py-1 text-xs text-white mb-1">
-          <input type="text" id="inp-m1-role" placeholder="Ruolo" class="w-full bg-slate-900 border border-slate-700 rounded px-2 py-1 text-xs text-white">
+        <div class="border-t border-slate-800 pt-3 space-y-2">
+          <h4 class="text-amber-400 font-bold text-[11px] uppercase tracking-wider">Membro 1</h4>
+          <input type="text" id="inp-m1-name" placeholder="Nome" class="w-full bg-slate-900 border border-slate-700 rounded-lg px-3 py-1.5 text-xs text-white">
+          <input type="text" id="inp-m1-role" placeholder="Ruolo" class="w-full bg-slate-900 border border-slate-700 rounded-lg px-3 py-1.5 text-xs text-white">
+        </div>
+        <div class="border-t border-slate-800 pt-3 space-y-2">
+          <h4 class="text-amber-400 font-bold text-[11px] uppercase tracking-wider">Membro 2</h4>
+          <input type="text" id="inp-m2-name" placeholder="Nome" class="w-full bg-slate-900 border border-slate-700 rounded-lg px-3 py-1.5 text-xs text-white">
+          <input type="text" id="inp-m2-role" placeholder="Ruolo" class="w-full bg-slate-900 border border-slate-700 rounded-lg px-3 py-1.5 text-xs text-white">
+        </div>
+        <div class="border-t border-slate-800 pt-3 space-y-2">
+          <h4 class="text-amber-400 font-bold text-[11px] uppercase tracking-wider">Membro 3</h4>
+          <input type="text" id="inp-m3-name" placeholder="Nome" class="w-full bg-slate-900 border border-slate-700 rounded-lg px-3 py-1.5 text-xs text-white">
+          <input type="text" id="inp-m3-role" placeholder="Ruolo" class="w-full bg-slate-900 border border-slate-700 rounded-lg px-3 py-1.5 text-xs text-white">
         </div>
 
-        <div class="border-t border-slate-800 pt-4 space-y-3">
-          <h4 class="text-amber-400 font-bold text-xs uppercase tracking-wider">Modifica Membro 2</h4>
-          <input type="text" id="inp-m2-name" placeholder="Nome" class="w-full bg-slate-900 border border-slate-700 rounded px-2 py-1 text-xs text-white mb-1">
-          <input type="text" id="inp-m2-role" placeholder="Ruolo" class="w-full bg-slate-900 border border-slate-700 rounded px-2 py-1 text-xs text-white">
-        </div>
-
-        <div class="border-t border-slate-800 pt-4 space-y-3">
-          <h4 class="text-amber-400 font-bold text-xs uppercase tracking-wider">Modifica Membro 3</h4>
-          <input type="text" id="inp-m3-name" placeholder="Nome" class="w-full bg-slate-900 border border-slate-700 rounded px-2 py-1 text-xs text-white mb-1">
-          <input type="text" id="inp-m3-role" placeholder="Ruolo" class="w-full bg-slate-900 border border-slate-700 rounded px-2 py-1 text-xs text-white">
-        </div>
-
-        <div class="flex justify-between border-t border-slate-800 pt-4">
-          <button onclick="saveChanges()" class="bg-amber-500 hover:bg-amber-400 text-slate-950 font-black px-6 py-2 rounded-lg font-orbitron cursor-pointer">Salva Modifiche</button>
+        <div class="flex justify-between items-center border-t border-slate-800 pt-4">
+          <button onclick="saveChanges()" class="bg-amber-500 hover:bg-amber-400 text-slate-950 font-black px-5 py-2 rounded-lg font-orbitron cursor-pointer text-sm">Salva Modifiche</button>
           <button onclick="closeAdmin()" class="text-slate-400 hover:text-white text-xs cursor-pointer">Chiudi</button>
         </div>
       </div>
     </div>
   </div>
 
-  <footer class="border-t border-slate-800 py-8 px-6 text-center text-slate-500 text-sm">
-    YUMA TEAM VSK <span class="text-amber-400">1999/2001 - 2026</span>
+  <!-- Footer -->
+  <footer class="border-t border-slate-800/80 py-10 px-5 text-center">
+    <div class="text-sky-400 font-orbitron font-bold tracking-widest text-lg mb-1">YUMA</div>
+    <p class="text-slate-500 text-sm">TEAM VSK · <span class="text-amber-400/90">1999/2001 – 2026</span></p>
+    <p class="text-slate-600 text-xs mt-3">25 Anni in Rotta Insieme</p>
   </footer>
 
   <script>
-    // Caricamento dati salvati nel browser
+    // Load saved data
     window.addEventListener('DOMContentLoaded', () => {
       const saved = localStorage.getItem('yuma_site_final');
       if (saved) {
         try {
           const data = JSON.parse(saved);
-          if(data.title) {
+          if (data.title) {
             document.getElementById('hero-title').innerText = data.title;
             document.getElementById('nav-logo').innerText = data.title;
           }
-          if(data.slogan) document.getElementById('hero-slogan').innerText = '"' + data.slogan + '"';
-          if(data.bg) {
-            document.getElementById('home').style.backgroundImage = `linear-gradient(to bottom, rgba(3, 7, 18, 0.7), rgba(3, 7, 18, 0.95)), url('${data.bg}')`;
+          if (data.slogan) document.getElementById('hero-slogan').innerText = '“' + data.slogan + '”';
+          if (data.bg) {
+            document.getElementById('home').style.backgroundImage =
+              `linear-gradient(to bottom, rgba(2,6,23,0.65) 0%, rgba(2,6,23,0.88) 55%, rgba(2,6,23,0.98) 100%), url('${data.bg}')`;
           }
-          if(data.m1n) document.getElementById('m1-name').innerText = data.m1n;
-          if(data.m1r) document.getElementById('m1-role').innerText = data.m1r;
-          if(data.m2n) document.getElementById('m2-name').innerText = data.m2n;
-          if(data.m2r) document.getElementById('m2-role').innerText = data.m2r;
-          if(data.m3n) document.getElementById('m3-name').innerText = data.m3n;
-          if(data.m3r) document.getElementById('m3-role').innerText = data.m3r;
-        } catch(e) {}
+          if (data.m1n) document.getElementById('m1-name').innerText = data.m1n;
+          if (data.m1r) document.getElementById('m1-role').innerText = data.m1r;
+          if (data.m2n) document.getElementById('m2-name').innerText = data.m2n;
+          if (data.m2r) document.getElementById('m2-role').innerText = data.m2r;
+          if (data.m3n) document.getElementById('m3-name').innerText = data.m3n;
+          if (data.m3r) document.getElementById('m3-role').innerText = data.m3r;
+        } catch (e) {}
       }
     });
+
+    // Nav scroll effect
+    window.addEventListener('scroll', () => {
+      const nav = document.getElementById('mainNav');
+      if (window.scrollY > 40) nav.classList.add('nav-scrolled');
+      else nav.classList.remove('nav-scrolled');
+    });
+
+    function toggleMenu() {
+      document.getElementById('mobileMenu').classList.toggle('open');
+    }
 
     function openAdmin() {
       document.getElementById('adminModal').style.display = 'flex';
       document.getElementById('adminLogin').style.display = 'block';
       document.getElementById('adminControls').style.display = 'none';
       document.getElementById('adminPass').value = '';
+      setTimeout(() => document.getElementById('adminPass').focus(), 100);
     }
 
     function closeAdmin() {
@@ -324,11 +472,8 @@
       if (pass === 'yuma2026' || pass === 'yuma') {
         document.getElementById('adminLogin').style.display = 'none';
         document.getElementById('adminControls').style.display = 'block';
-        
-        // Popola i campi con i dati attuali
         document.getElementById('inp-title').value = document.getElementById('hero-title').innerText;
-        document.getElementById('inp-slogan').value = document.getElementById('hero-slogan').innerText.replace(/"/g, '');
-        
+        document.getElementById('inp-slogan').value = document.getElementById('hero-slogan').innerText.replace(/[“”"]/g, '');
         document.getElementById('inp-m1-name').value = document.getElementById('m1-name').innerText;
         document.getElementById('inp-m1-role').value = document.getElementById('m1-role').innerText;
         document.getElementById('inp-m2-name').value = document.getElementById('m2-name').innerText;
@@ -336,7 +481,7 @@
         document.getElementById('inp-m3-name').value = document.getElementById('m3-name').innerText;
         document.getElementById('inp-m3-role').value = document.getElementById('m3-role').innerText;
       } else {
-        alert('Password Errata!');
+        alert('Password errata!');
       }
     }
 
@@ -352,9 +497,8 @@
         m3n: document.getElementById('inp-m3-name').value,
         m3r: document.getElementById('inp-m3-role').value,
       };
-
       localStorage.setItem('yuma_site_final', JSON.stringify(data));
-      location.reload(); // Ricarica istantaneamente per applicare tutto
+      location.reload();
     }
 
     function submitCandidatura(event) {
@@ -364,6 +508,11 @@
       successDiv.classList.remove('hidden');
       setTimeout(() => successDiv.classList.add('hidden'), 5000);
     }
+
+    // Close modal on backdrop click
+    document.getElementById('adminModal').addEventListener('click', (e) => {
+      if (e.target.id === 'adminModal') closeAdmin();
+    });
   </script>
 </body>
 </html>
