@@ -145,7 +145,7 @@ async function handleLogin(e) {
     currentUser = res.data.user;
     await loadUserProfile();
     if (userProfile && userProfile.status === 'pending') {
-      if (errBox) { errBox.textContent = 'Account in attesa di approvazione da parte dell\'admin.'; errBox.classList.remove('hidden'); }
+      if (errBox) { errBox.textContent = '' + (typeof t === 'function' ? t('alert_pending') : 'Account in attesa di approvazione da parte dell\'admin.') + ''; errBox.classList.remove('hidden'); }
     } else if (userProfile && userProfile.status === 'rejected') {
       if (errBox) { errBox.textContent = 'Registrazione non approvata.'; errBox.classList.remove('hidden'); }
       await supabaseClient.auth.signOut();
@@ -541,6 +541,11 @@ async function loadApprovedMembers() {
 }
 
 function renderAreaMembri() {
+  var _t = typeof t === 'function' ? t : function(k, v) {
+    var s = k;
+    if (v && v.name) s = 'Benvenuto a bordo, ' + v.name + '!';
+    return s;
+  };
   var box = document.getElementById('areaMembriContent');
   if (!box) return;
   var name = (userProfile && userProfile.display_name) || (currentUser && currentUser.email) || 'Membro';
@@ -554,30 +559,30 @@ function renderAreaMembri() {
     '<div class="inline-flex items-center gap-2 px-4 py-1.5 rounded-full border text-sm font-semibold mb-4 ' + roleColor + '">' +
       '<span class="w-2 h-2 rounded-full bg-current"></span> ' + escapeHtml(roleLabel) +
     '</div>' +
-    '<h3 class="text-2xl md:text-3xl font-black font-orbitron text-white">Benvenuto a bordo, ' + escapeHtml(name) + '!</h3>' +
-    '<p class="text-slate-400 mt-2 text-sm md:text-base">Sei ufficialmente parte della community YUMA.</p>' +
+    '<h3 class="text-2xl md:text-3xl font-black font-orbitron text-white">' + escapeHtml(_t('area_welcome', {name: name})) + '</h3>' +
+    '<p class="text-slate-400 mt-2 text-sm md:text-base">' + escapeHtml(_t('area_welcome_sub')) + '</p>' +
   '</div>' +
   '<div class="grid sm:grid-cols-2 gap-4 mb-8">' +
     '<div class="glass-card p-5 rounded-2xl border border-sky-500/20">' +
-      '<div class="text-sky-400 text-xs font-semibold uppercase tracking-wider mb-1">Il tuo ruolo</div>' +
+      '<div class="text-sky-400 text-xs font-semibold uppercase tracking-wider mb-1">' + escapeHtml(_t('area_role')) + '</div>' +
       '<div class="text-xl font-bold font-orbitron text-white">' + escapeHtml(roleLabel) + '</div>' +
       '<p class="text-slate-400 text-xs mt-2">' +
-        (role === 'yuma' ? 'Membro del team YUMA – regate, tattica e cameratismo.' :
-         role === 'socio' ? 'Socio della community – supporto e passione per la vela virtuale.' :
-         'Amministratore del sito.') +
+        (role === 'yuma' ? _t('area_role_yuma') :
+         role === 'socio' ? _t('area_role_socio') :
+         _t('area_role_admin')) +
       '</p>' +
     '</div>' +
     '<div class="glass-card p-5 rounded-2xl border border-amber-500/20">' +
-      '<div class="text-amber-400 text-xs font-semibold uppercase tracking-wider mb-1">Prossimi passi</div>' +
+      '<div class="text-amber-400 text-xs font-semibold uppercase tracking-wider mb-1">' + escapeHtml(_t('area_next')) + '</div>' +
       '<ul class="text-slate-300 text-sm space-y-1.5 mt-2">' +
-        '<li>• Unisciti al canale Discord del team</li>' +
-        '<li>• Partecipa alle regate e agli allenamenti</li>' +
-        '<li>• Contatta un admin per qualsiasi dubbio</li>' +
+        '<li>' + escapeHtml(_t('area_next1')) + '</li>' +
+        '<li>' + escapeHtml(_t('area_next2')) + '</li>' +
+        '<li>' + escapeHtml(_t('area_next3')) + '</li>' +
       '</ul>' +
     '</div>' +
   '</div>' +
   '<div id="areaMembriList" class="glass-card p-5 rounded-2xl">' +
-    '<h4 class="text-sm font-semibold text-slate-300 uppercase tracking-wider mb-3">Membri approvati</h4>' +
+    '<h4 class="text-sm font-semibold text-slate-300 uppercase tracking-wider mb-3">' + escapeHtml(_t('area_members')) + '</h4>' +
     '<p class="text-slate-500 text-xs">Caricamento...</p>' +
   '</div>';
 
@@ -585,10 +590,10 @@ function renderAreaMembri() {
     var listBox = document.getElementById('areaMembriList');
     if (!listBox) return;
     if (!list.length) {
-      listBox.innerHTML = '<h4 class="text-sm font-semibold text-slate-300 uppercase tracking-wider mb-3">Membri approvati</h4><p class="text-slate-500 text-xs">Nessun altro membro ancora.</p>';
+      listBox.innerHTML = '<h4 class="text-sm font-semibold text-slate-300 uppercase tracking-wider mb-3">' + escapeHtml(_t('area_members')) + '</h4><p class="text-slate-500 text-xs">' + escapeHtml(_t('area_members_none')) + '</p>';
       return;
     }
-    listBox.innerHTML = '<h4 class="text-sm font-semibold text-slate-300 uppercase tracking-wider mb-3">Membri approvati (' + list.length + ')</h4>' +
+    listBox.innerHTML = '<h4 class="text-sm font-semibold text-slate-300 uppercase tracking-wider mb-3">' + escapeHtml(_t('area_members')) + ' (' + list.length + ')</h4>' +
       '<div class="flex flex-wrap gap-2">' +
       list.map(function(p) {
         var r = p.role === 'admin' ? 'Admin' : (p.role === 'yuma' ? 'YUMA' : 'Socio');
@@ -603,6 +608,10 @@ function renderAreaMembri() {
 
 
 document.addEventListener('DOMContentLoaded', async function() {
+  // i18n init
+  if (typeof setLanguage === 'function') {
+    setLanguage(localStorage.getItem('yuma_lang') || 'it');
+  }
   var loginModal = document.getElementById('loginModal');
   var registerModal = document.getElementById('registerModal');
   var adminModal = document.getElementById('adminModal');
