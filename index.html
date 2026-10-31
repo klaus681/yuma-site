@@ -64,6 +64,12 @@
       <a href="#area-membri" class="nav-area-membri hidden hover:text-emerald-400 transition text-emerald-400/90">Area Membri</a>
     </div>
     <div class="flex items-center gap-2.5">
+            <div class="lang-switcher" title="Language / Lingua">
+        <button type="button" class="lang-btn" data-lang="it" onclick="setLanguage('it')" aria-label="Italiano"><span class="flag">🇮🇹</span></button>
+        <button type="button" class="lang-btn" data-lang="en" onclick="setLanguage('en')" aria-label="English"><span class="flag">🇬🇧</span></button>
+        <button type="button" class="lang-btn" data-lang="es" onclick="setLanguage('es')" aria-label="Español"><span class="flag">🇪🇸</span></button>
+        <button type="button" class="lang-btn" data-lang="fr" onclick="setLanguage('fr')" aria-label="Français"><span class="flag">🇫🇷</span></button>
+      </div>
       <div id="authLoggedOut" class="flex items-center gap-2">
         <button type="button" onclick="openLoginModal()" class="btn-secondary text-xs px-3 py-1.5" data-i18n="nav_login">Accedi</button>
         <button type="button" onclick="openRegisterModal()" class="text-xs px-3 py-1.5 text-amber-400 hover:text-amber-300 font-semibold transition" data-i18n="nav_register">Registrati</button>
@@ -107,7 +113,8 @@
 
 <section id="home" class="min-h-screen flex flex-col justify-center items-center text-center pt-24 pb-16 px-4 relative bg-cover bg-center transition-all duration-500"
   style="background-image: linear-gradient(to bottom, rgba(2,6,23,0.65) 0%, rgba(2,6,23,0.88) 55%, rgba(2,6,23,0.98) 100%), url('https://images.unsplash.com/photo-1507525428034-b723cf961d3e?auto=format&fit=crop&w=1920&q=80');">
-  <div class="fade-up inline-flex items-center gap-2 jubilee-badge rounded-full px-4 py-1.5 mb-5 shadow-md">
+  <img src="yuma-logo-hero.png" alt="YUMA 25" class="fade-up w-40 sm:w-52 md:w-64 h-auto mb-6 drop-shadow-[0_0_24px_rgba(56,189,248,0.35)] select-none" width="400" height="262" />
+  <div class="fade-up delay-1 inline-flex items-center gap-2 jubilee-badge rounded-full px-4 py-1.5 mb-5 shadow-md">
     <span class="w-1.5 h-1.5 rounded-full bg-amber-400 animate-pulse"></span>
     <span class="text-amber-300 text-xs sm:text-sm font-semibold tracking-wide"><span data-i18n="hero_badge">1999/2001 – 2026 · 25 Anni di Virtual Sailing</span></span>
   </div>
