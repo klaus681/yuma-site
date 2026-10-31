@@ -429,3 +429,48 @@ function applyTranslations() {
     if (area && !area.classList.contains('hidden')) renderAreaMembri();
   }
 }
+
+function injectLangSwitcher() {
+  if (document.getElementById('yumaLangSwitcher')) return;
+  var style = document.createElement('style');
+  style.textContent = '.lang-switcher{display:flex;align-items:center;gap:0.35rem}.lang-btn{width:1.75rem;height:1.75rem;border-radius:9999px;overflow:hidden;cursor:pointer;border:1.5px solid rgba(148,163,184,0.4);transition:all 0.2s;opacity:0.55;padding:0;background:transparent;line-height:0}.lang-btn:hover{opacity:0.95;transform:scale(1.1)}.lang-btn.ring-2{opacity:1;border-color:rgba(56,189,248,0.8);box-shadow:0 0 0 2px rgba(56,189,248,0.25)}.lang-btn span.flag{width:100%;height:100%;display:flex;align-items:center;justify-content:center;font-size:1.05rem;line-height:1}';
+  document.head.appendChild(style);
+
+  var box = document.createElement('div');
+  box.id = 'yumaLangSwitcher';
+  box.className = 'lang-switcher';
+  box.title = 'Language / Lingua';
+  box.innerHTML =
+    '<button type="button" class="lang-btn" data-lang="it" onclick="setLanguage(\'it\')" aria-label="Italiano"><span class="flag">🇮🇹</span></button>' +
+    '<button type="button" class="lang-btn" data-lang="en" onclick="setLanguage(\'en\')" aria-label="English"><span class="flag">🇬🇧</span></button>' +
+    '<button type="button" class="lang-btn" data-lang="es" onclick="setLanguage(\'es\')" aria-label="Español"><span class="flag">🇪🇸</span></button>' +
+    '<button type="button" class="lang-btn" data-lang="fr" onclick="setLanguage(\'fr\')" aria-label="Français"><span class="flag">🇫🇷</span></button>';
+
+  // Insert in navbar, before auth buttons
+  var navRight = document.querySelector('#mainNav .flex.items-center.gap-2\\.5') ||
+                 document.querySelector('#mainNav .max-w-7xl > div:last-child') ||
+                 document.querySelector('#mainNav .max-w-7xl');
+  if (navRight) {
+    var first = navRight.firstElementChild;
+    if (first) navRight.insertBefore(box, first);
+    else navRight.appendChild(box);
+  } else {
+    // fallback: fixed top-right
+    box.style.cssText = 'position:fixed;top:12px;right:12px;z-index:60;background:rgba(2,6,23,0.85);padding:6px 8px;border-radius:9999px;border:1px solid rgba(56,189,248,0.2)';
+    document.body.appendChild(box);
+  }
+}
+
+// Auto-init when DOM ready
+(function initI18n() {
+  function boot() {
+    injectLangSwitcher();
+    setLanguage(localStorage.getItem('yuma_lang') || 'it');
+  }
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', boot);
+  } else {
+    boot();
+  }
+})();
+
