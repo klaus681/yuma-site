@@ -5,6 +5,23 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>YUMA Team | 25 Anni in Rotta Insieme</title>
   <meta name="description" content="YUMA Team – 25 anni di Virtual Skipper. Amicizia, passione e regate virtuali dal 2001.">
+  <link rel="canonical" href="https://klaus681.github.io/yuma-site/">
+  <meta name="theme-color" content="#020617">
+  <meta name="robots" content="index, follow">
+  <link rel="icon" href="favicon.svg" type="image/svg+xml">
+  <!-- Open Graph / social -->
+  <meta property="og:type" content="website">
+  <meta property="og:site_name" content="YUMA Team">
+  <meta property="og:title" content="YUMA Team | 25 Anni in Rotta Insieme">
+  <meta property="og:description" content="YUMA Team – 25 anni di Virtual Skipper. Amicizia, passione e regate virtuali dal 2001.">
+  <meta property="og:url" content="https://klaus681.github.io/yuma-site/">
+  <meta property="og:locale" content="it_IT">
+  <meta property="og:locale:alternate" content="en_US">
+  <meta property="og:locale:alternate" content="es_ES">
+  <meta property="og:locale:alternate" content="fr_FR">
+  <meta name="twitter:card" content="summary">
+  <meta name="twitter:title" content="YUMA Team | 25 Anni in Rotta Insieme">
+  <meta name="twitter:description" content="YUMA Team – 25 anni di Virtual Skipper. Amicizia, passione e regate virtuali dal 2001.">
   <script src="https://cdn.tailwindcss.com"></script>
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
   <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -61,7 +78,6 @@
       <a href="#trofei" class="hover:text-sky-400 transition" data-i18n="nav_trofei">Trofei</a>
       <a href="#roster" class="hover:text-sky-400 transition" data-i18n="nav_roster">Equipaggio</a>
       <a href="#unisciti" class="hover:text-amber-400 transition" data-i18n="nav_unisciti">Unisciti</a>
-      <a href="#area-membri" class="nav-area-membri hidden hover:text-emerald-400 transition text-emerald-400/90">Area Membri</a>
     </div>
     <div class="flex items-center gap-2.5">
             <div id="authLoggedOut" class="flex items-center gap-2">
@@ -73,11 +89,12 @@
           <svg class="w-3.5 h-3.5 shrink-0" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M10 9a3 3 0 100-6 3 3 0 000 6zm-7 9a7 7 0 1114 0H3z" clip-rule="evenodd"/></svg>
           <span id="userEmailLabel">Utente</span>
         </span>
-        <a href="#area-membri" class="nav-area-membri hidden text-xs px-3 py-1.5 rounded-lg border border-emerald-500/40 text-emerald-300 hover:bg-emerald-500/15 font-semibold transition">Area Membri</a>
+        <a href="#area-soci" class="nav-area-soci hidden text-xs px-3 py-1.5 rounded-lg border border-emerald-500/40 text-emerald-300 hover:bg-emerald-500/15 font-semibold transition" data-i18n="nav_area">Area Soci</a>
+        <a href="#area-yuma" class="nav-area-yuma hidden text-xs px-3 py-1.5 rounded-lg border border-amber-500/40 text-amber-300 hover:bg-amber-500/15 font-semibold transition" data-i18n="nav_area_yuma">YUMA Only</a>
         <button type="button" onclick="openAdminPanel()" class="bg-amber-500/90 hover:bg-amber-400 text-slate-950 font-black px-3 py-1.5 rounded-lg transition text-[11px] font-orbitron cursor-pointer shadow-lg shadow-amber-500/15" title="Pannello Admin">⚙️ Admin</button>
         <button type="button" onclick="logout()" class="text-slate-400 hover:text-red-400 text-xs font-semibold px-2 py-1.5 transition" title="Esci">Esci</button>
       </div>
-      <a href="#unisciti" class="hidden sm:inline-flex bg-gradient-to-r from-sky-500 to-blue-600 hover:from-sky-400 hover:to-blue-500 text-white font-bold px-4 py-1.5 rounded-lg transition shadow-lg shadow-sky-500/20 font-orbitron text-xs">Candidati</a>
+      <a href="#unisciti" id="navCandidati" class="hidden sm:inline-flex bg-gradient-to-r from-sky-500 to-blue-600 hover:from-sky-400 hover:to-blue-500 text-white font-bold px-4 py-1.5 rounded-lg transition shadow-lg shadow-sky-500/20 font-orbitron text-xs">Candidati</a>
       <button type="button" id="menuBtn" onclick="toggleMenu()" class="md:hidden text-slate-300 hover:text-white p-1.5" aria-label="Menu">
         <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"/></svg>
       </button>
@@ -90,14 +107,14 @@
       <a href="#trofei" onclick="toggleMenu()" class="px-3 py-2 rounded-lg hover:bg-slate-800/60 hover:text-sky-400">Trofei</a>
       <a href="#roster" onclick="toggleMenu()" class="px-3 py-2 rounded-lg hover:bg-slate-800/60 hover:text-sky-400">Equipaggio</a>
       <a href="#unisciti" onclick="toggleMenu()" class="px-3 py-2 rounded-lg hover:bg-slate-800/60 hover:text-amber-400">Unisciti a Noi</a>
-      <a href="#area-membri" onclick="toggleMenu()" class="nav-area-membri hidden px-3 py-2 rounded-lg hover:bg-slate-800/60 text-emerald-400">Area Membri</a>
       <div class="border-t border-slate-800 my-2"></div>
       <div id="mobileAuthOut">
         <button type="button" onclick="toggleMenu(); openLoginModal()" class="w-full text-left px-3 py-2 rounded-lg hover:bg-slate-800/60 text-sky-400" data-i18n="nav_login">Accedi</button>
         <button type="button" onclick="toggleMenu(); openRegisterModal()" class="w-full text-left px-3 py-2 rounded-lg hover:bg-slate-800/60 text-amber-400" data-i18n="nav_register">Registrati</button>
       </div>
       <div id="mobileAuthIn" class="hidden">
-        <a href="#area-membri" onclick="toggleMenu()" class="nav-area-membri hidden block w-full text-left px-3 py-2 rounded-lg hover:bg-slate-800/60 text-emerald-400">Area Membri</a>
+        <a href="#area-soci" onclick="toggleMenu()" class="nav-area-soci hidden block w-full text-left px-3 py-2 rounded-lg hover:bg-slate-800/60 text-emerald-400" data-i18n="nav_area">Area Soci</a>
+        <a href="#area-yuma" onclick="toggleMenu()" class="nav-area-yuma hidden block w-full text-left px-3 py-2 rounded-lg hover:bg-slate-800/60 text-amber-400" data-i18n="nav_area_yuma">YUMA Only</a>
         <button type="button" onclick="toggleMenu(); openAdminPanel()" class="w-full text-left px-3 py-2 rounded-lg hover:bg-slate-800/60 text-amber-400">⚙️ Pannello Admin</button>
         <button type="button" onclick="toggleMenu(); logout()" class="w-full text-left px-3 py-2 rounded-lg hover:bg-slate-800/60 text-red-400" data-i18n="nav_logout">Esci</button>
       </div>
@@ -227,6 +244,7 @@
       <button type="button" onclick="showAdminTab('content')" id="tab-content" class="admin-tab px-3 py-1.5 rounded-lg bg-sky-500/20 text-sky-300 border border-sky-500/30">Contenuti</button>
       <button type="button" onclick="showAdminTab('roster')" id="tab-roster" class="admin-tab px-3 py-1.5 rounded-lg bg-slate-800/60 text-slate-400 border border-slate-700">Equipaggio</button>
       <button type="button" onclick="showAdminTab('users')" id="tab-users" class="admin-tab px-3 py-1.5 rounded-lg bg-slate-800/60 text-slate-400 border border-slate-700">Utenti</button>
+      <button type="button" onclick="showAdminTab('aree')" id="tab-aree" class="admin-tab px-3 py-1.5 rounded-lg bg-slate-800/60 text-slate-400 border border-slate-700">Aree</button>
       <button type="button" onclick="showAdminTab('system')" id="tab-system" class="admin-tab px-3 py-1.5 rounded-lg bg-slate-800/60 text-slate-400 border border-slate-700">Sistema</button>
     </div>
     <div id="adminTab-content" class="space-y-4 text-left">
@@ -259,6 +277,37 @@
         <div id="activeUsersList" class="space-y-2 max-h-40 overflow-y-auto"></div>
       </div>
     </div>
+    <div id="adminTab-aree" class="space-y-5 text-left hidden">
+      <div class="bg-emerald-500/10 border border-emerald-500/25 p-3 rounded-lg text-emerald-300 text-xs">
+        Qui gestisci <strong>tutto quello che c'è dentro le due aree</strong>: ogni voce è una
+        scheda con titolo, testo e link facoltativo. Le schede di <strong>Area Soci</strong> le
+        vedono tutti gli approvati, quelle di <strong>YUMA Only</strong> solo l'equipaggio.
+      </div>
+
+      <div>
+        <h4 class="text-emerald-400 font-bold text-[11px] uppercase tracking-wider mb-2">Area Soci</h4>
+        <div id="adminAreaSoci" class="space-y-3 max-h-56 overflow-y-auto"></div>
+        <div class="border border-emerald-500/30 rounded-xl p-3 space-y-2 bg-emerald-500/5 mt-2">
+          <h5 class="text-emerald-300 font-bold text-[10px] uppercase tracking-wider">Nuova scheda</h5>
+          <input type="text" id="new-item-soci-titolo" placeholder="Titolo (es. Regolamento 2026)" class="auth-input text-xs">
+          <textarea rows="3" id="new-item-soci-testo" placeholder="Testo (una riga per punto)" class="auth-input text-xs"></textarea>
+          <input type="url" id="new-item-soci-url" placeholder="Link facoltativo https://..." class="auth-input text-xs">
+          <button type="button" onclick="addAreaItem('soci')" class="btn-secondary text-xs w-full py-2">+ Aggiungi in Area Soci</button>
+        </div>
+      </div>
+
+      <div>
+        <h4 class="text-amber-400 font-bold text-[11px] uppercase tracking-wider mb-2">YUMA Only</h4>
+        <div id="adminAreaYuma" class="space-y-3 max-h-56 overflow-y-auto"></div>
+        <div class="border border-amber-500/30 rounded-xl p-3 space-y-2 bg-amber-500/5 mt-2">
+          <h5 class="text-amber-300 font-bold text-[10px] uppercase tracking-wider">Nuova scheda</h5>
+          <input type="text" id="new-item-yuma-titolo" placeholder="Titolo (es. Briefing regata)" class="auth-input text-xs">
+          <textarea rows="3" id="new-item-yuma-testo" placeholder="Testo (una riga per punto)" class="auth-input text-xs"></textarea>
+          <input type="url" id="new-item-yuma-url" placeholder="Link facoltativo https://..." class="auth-input text-xs">
+          <button type="button" onclick="addAreaItem('yuma')" class="btn-secondary text-xs w-full py-2">+ Aggiungi in YUMA Only</button>
+        </div>
+      </div>
+    </div>
     <div id="adminTab-system" class="space-y-4 text-left hidden">
       <div class="bg-slate-800/50 border border-slate-700 rounded-xl p-4 text-sm text-slate-300 space-y-2">
         <p><span class="text-slate-500">Stato:</span> <span class="text-emerald-400 font-semibold">Connesso a Supabase</span></p>
@@ -278,14 +327,26 @@
 </div>
 
 
-<section id="area-membri" class="hidden py-20 md:py-28 px-5 max-w-4xl mx-auto">
+<section id="area-soci" class="hidden py-20 md:py-28 px-5 max-w-4xl mx-auto">
   <div class="section-divider mb-16 md:mb-20"></div>
   <div class="text-center mb-10">
-    <span class="text-emerald-400 font-orbitron uppercase tracking-[0.2em] text-xs font-semibold" data-i18n="area_label">Solo per membri</span>
-    <h2 class="text-3xl md:text-5xl font-black mt-2 font-orbitron tracking-tight" data-i18n="area_title">Area Membri</h2>
+    <span class="text-emerald-400 font-orbitron uppercase tracking-[0.2em] text-xs font-semibold" data-i18n="area_label">Riservata ai soci</span>
+    <h2 class="text-3xl md:text-5xl font-black mt-2 font-orbitron tracking-tight" data-i18n="area_title">Area Soci</h2>
     <p class="text-slate-400 mt-2 text-sm md:text-base"><span data-i18n="area_desc">Il tuo spazio a bordo della community YUMA.</span></p>
   </div>
-  <div id="areaMembriContent" class="glass-card p-6 md:p-10 rounded-3xl border border-emerald-500/25">
+  <div id="areaSociContent" class="glass-card p-6 md:p-10 rounded-3xl border border-emerald-500/25">
+    <p class="text-slate-500 text-center text-sm">Caricamento...</p>
+  </div>
+</section>
+
+<section id="area-yuma" class="hidden py-20 md:py-28 px-5 max-w-4xl mx-auto">
+  <div class="section-divider mb-16 md:mb-20"></div>
+  <div class="text-center mb-10">
+    <span class="text-amber-400 font-orbitron uppercase tracking-[0.2em] text-xs font-semibold" data-i18n="yuma_label">Solo equipaggio YUMA</span>
+    <h2 class="text-3xl md:text-5xl font-black mt-2 font-orbitron tracking-tight" data-i18n="yuma_title">YUMA Only</h2>
+    <p class="text-slate-400 mt-2 text-sm md:text-base"><span data-i18n="yuma_desc">Spazio riservato ai membri del team YUMA.</span></p>
+  </div>
+  <div id="areaYumaContent" class="glass-card p-6 md:p-10 rounded-3xl border border-amber-500/25">
     <p class="text-slate-500 text-center text-sm">Caricamento...</p>
   </div>
 </section>
