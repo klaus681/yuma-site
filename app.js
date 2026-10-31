@@ -7,7 +7,7 @@ try {
 } catch (e) { console.error(e); }
 
 function escapeHtml(s) {
-  return String(s || '').replace(/&/g,'&').replace(/</g,'<').replace(/>/g,'>').replace(/"/g,'"');
+  return String(s || '').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
 }
 function openLoginModal() {
   var m = document.getElementById('loginModal'); if (!m) return;
@@ -487,7 +487,7 @@ async function submitCandidatura(event) {
   var s = document.getElementById('candidaturaSuccess');
   if (s) { s.classList.remove('hidden'); setTimeout(function(){ s.classList.add('hidden'); }, 5000); }
 }
-async async function loadCandidatureList() {
+async function loadCandidatureList() {
   var box = document.getElementById('candidatureList');
   if (!box || !isAdmin || !supabaseClient) return;
   box.innerHTML = '<p class="text-slate-500 text-xs">Caricamento...</p>';
