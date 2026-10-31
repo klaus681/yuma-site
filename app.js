@@ -487,25 +487,43 @@ async function submitCandidatura(event) {
   var s = document.getElementById('candidaturaSuccess');
   if (s) { s.classList.remove('hidden'); setTimeout(function(){ s.classList.add('hidden'); }, 5000); }
 }
-async function loadCandidatureList() {
+async async function loadCandidatureList() {
   var box = document.getElementById('candidatureList');
   if (!box || !isAdmin || !supabaseClient) return;
   box.innerHTML = '<p class="text-slate-500 text-xs">Caricamento...</p>';
-  var res = await supabaseClient.from('candidature').select('*').order('created_at', { ascending: false }).limit(20);
+  var res = await supabaseClient.from('candidature').select('*').order('created_at', { ascending: false }).limit(50);
   if (res.error) { box.innerHTML = '<p class="text-red-400 text-xs">' + res.error.message + '</p>'; return; }
   if (!res.data || !res.data.length) { box.innerHTML = '<p class="text-slate-500 text-xs">Nessuna candidatura.</p>'; return; }
   box.innerHTML = res.data.map(function(c) {
-    return '<div class="border border-slate-700 rounded-lg p-2.5 text-xs ' + (c.letto ? 'opacity-60' : '') + '">' +
+    var actions = '';
+    if (!c.letto) {
+      actions = '<button type="button" onclick="markCandidaturaLetta(' + c.id + ')" class="mt-1.5 text-amber-400 text-[11px] hover:underline">Segna come letta</button>';
+    } else {
+      actions = '<span class="text-slate-600 text-[11px] mr-2">Letta</span>' +
+        '<button type="button" onclick="deleteCandidatura(' + c.id + ')" class="mt-1.5 text-red-400 text-[11px] hover:underline">Elimina</button>';
+    }
+    return '<div class="border border-slate-700 rounded-lg p-2.5 text-xs ' + (c.letto ? 'opacity-70' : '') + '">' +
       '<div class="flex justify-between gap-2"><strong class="text-white">' + escapeHtml(c.nome) + '</strong><span class="text-slate-500">' + new Date(c.created_at).toLocaleDateString('it-IT') + '</span></div>' +
       '<div class="text-sky-400 mt-0.5">' + escapeHtml(c.contatto) + '</div>' +
       (c.messaggio ? '<p class="text-slate-400 mt-1">' + escapeHtml(c.messaggio) + '</p>' : '') +
-      (!c.letto ? '<button type="button" onclick="markCandidaturaLetta(' + c.id + ')" class="mt-1.5 text-amber-400 text-[11px]">Segna come letta</button>' : '<span class="text-slate-600 text-[11px]">Letta</span>') +
+      '<div class="flex items-center gap-2 mt-1">' + actions + '</div>' +
       '</div>';
   }).join('');
 }
 async function markCandidaturaLetta(id) {
-  if (!supabaseClient) return;
-  await supabaseClient.from('candidature').update({ letto: true }).eq('id', id);
+  if (!supabaseClient || !isAdmin) return;
+  var res = await supabaseClient.from('candidature').update({ letto: true }).eq('id', id);
+  if (res.error) { alert('Errore: ' + res.error.message); return; }
+  loadCandidatureList();
+}
+async function deleteCandidatura(id) {
+  if (!supabaseClient || !isAdmin) return;
+  if (!confirm('Eliminare definitivamente questa candidatura?')) return;
+  var res = await supabaseClient.from('candidature').delete().eq('id', id);
+  if (res.error) {
+    alert('Errore eliminazione: ' + res.error.message + '\n\nSe compare un errore di policy, esegui in Supabase lo SQL per permettere DELETE all\'admin.');
+    return;
+  }
   loadCandidatureList();
 }
 
