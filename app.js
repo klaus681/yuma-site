@@ -1,31 +1,13 @@
 const SUPABASE_URL = 'https://eefszkqpfwwxoljauobs.supabase.co';
 const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImVlZnN6a3FwZnd3eG9samF1b2JzIiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTMzNjI4MTMsImV4cCI6MjEwODkzODgxM30.xak6904GHCnq4LSJsfNdNGGZeNa7ObRsV6NhfyFE2Zs';
-const ADMIN_EMAIL = 'klaus68@hotmail.it';
-let supabaseClient = null, currentUser = null, isAdmin = false, isYuma = false, userProfile = null, membersCache = [], areaItemsCache = [], areaItemsLoaded = false;
+let supabaseClient = null, currentUser = null, isAdmin = false, userProfile = null, membersCache = [];
 try {
   if (window.supabase && window.supabase.createClient)
     supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 } catch (e) { console.error(e); }
 
 function escapeHtml(s) {
-  return String(s || '').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#39;');
-}
-// Svuota il contenuto di un'area riservata: quando l'utente perde i permessi
-// (logout o cambio ruolo) i dati non devono restare nel DOM, nemmeno nascosti.
-function clearArea(id) {
-  var el = document.getElementById(id);
-  if (el) el.innerHTML = '';
-}
-// Se il nome è in realtà un'email (capita ai profili creati a mano dal pannello
-// Supabase) mostriamo solo la parte prima della @, per non avere
-// "klaus68@hotmail.it" in evidenza nell'interfaccia.
-function prettyName(raw) {
-  var s = String(raw == null ? '' : raw).trim();
-  var at = s.indexOf('@');
-  return at > 0 ? s.slice(0, at) : s;
-}
-function displayName() {
-  return prettyName((userProfile && userProfile.display_name) || (currentUser && currentUser.email));
+  return String(s || '').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
 }
 function openLoginModal() {
   var m = document.getElementById('loginModal'); if (!m) return;
@@ -58,7 +40,7 @@ function closeAdminPanel() {
 }
 function toggleMenu() { var menu = document.getElementById('mobileMenu'); if (menu) menu.classList.toggle('open'); }
 function showAdminTab(name) {
-  ['content','roster','users','system','aree'].forEach(function(t) {
+  ['content','roster','users','system'].forEach(function(t) {
     var tab = document.getElementById('adminTab-' + t), btn = document.getElementById('tab-' + t);
     if (tab) tab.classList.toggle('hidden', t !== name);
     if (btn) btn.className = t === name
@@ -67,7 +49,6 @@ function showAdminTab(name) {
   });
   if (name === 'roster') renderAdminMembers();
   if (name === 'users') loadUsersAdmin();
-  if (name === 'aree') loadAreaItems().then(renderAdminAreaItems);
   if (name === 'system') loadCandidatureList();
 }
 
@@ -86,92 +67,58 @@ async function initAuth() {
   } catch (e) { console.error(e); }
 }
 async function loadUserProfile() {
-  userProfile = null; isAdmin = false; isYuma = false;
+  userProfile = null; isAdmin = false;
   if (!currentUser || !supabaseClient) return;
-  var adminByEmail = (currentUser.email || '').toLowerCase() === ADMIN_EMAIL;
   try {
     var res = await supabaseClient.from('profiles').select('*').eq('id', currentUser.id).maybeSingle();
     if (!res.error && res.data) {
       userProfile = res.data;
-      var approved = userProfile.status === 'approved' || !userProfile.status;
-      isAdmin = userProfile.role === 'admin' && approved;
-      isYuma = isAdmin || (userProfile.role === 'yuma' && approved);
-      if (adminByEmail) { isAdmin = true; isYuma = true; }
-    } else if (adminByEmail) {
-      isAdmin = true; isYuma = true;
+      isAdmin = userProfile.role === 'admin' && (userProfile.status === 'approved' || !userProfile.status);
+      if ((currentUser.email || '').toLowerCase() === 'klaus68@hotmail.it') isAdmin = true;
+    } else if ((currentUser.email || '').toLowerCase() === 'klaus68@hotmail.it') {
+      isAdmin = true;
     }
   } catch (e) {
-    if (adminByEmail) { isAdmin = true; isYuma = true; }
+    if ((currentUser.email || '').toLowerCase() === 'klaus68@hotmail.it') isAdmin = true;
   }
 }
 function updateAuthUI() {
   var loggedOut = document.getElementById('authLoggedOut'), loggedIn = document.getElementById('authLoggedIn');
   var mobOut = document.getElementById('mobileAuthOut'), mobIn = document.getElementById('mobileAuthIn');
   if (!loggedOut || !loggedIn) return;
-  var isApprovedMember = !!(currentUser && (isAdmin || isYuma || (userProfile && (userProfile.status === 'approved' || userProfile.role === 'admin'))));
+  var isApprovedMember = !!(currentUser && userProfile && (userProfile.status === 'approved' || userProfile.role === 'admin' || isAdmin));
   if (currentUser) {
     loggedOut.classList.add('hidden'); loggedOut.classList.remove('flex');
     loggedIn.classList.remove('hidden'); loggedIn.classList.add('flex');
     if (mobOut) mobOut.classList.add('hidden'); if (mobIn) mobIn.classList.remove('hidden');
-    // Da loggati il pulsante "Candidati" non serve
-    var candidati = document.getElementById('navCandidati');
-    if (candidati) candidati.style.display = 'none';
-    // Contenuti delle due aree: una sola lettura per sessione, poi si ri-renderizza
-    if (!areaItemsLoaded && isApprovedMember) {
-      loadAreaItems().then(function() { updateAuthUI(); });
-    }
     var label = document.getElementById('userEmailLabel');
-    var name = displayName() || 'Utente';
+    var name = (userProfile && userProfile.display_name) || currentUser.email || 'Utente';
     if (label) label.textContent = name;
     document.querySelectorAll('[onclick*="openAdminPanel"]').forEach(function(b) {
       b.style.display = isAdmin ? '' : 'none';
     });
-    // Area Soci links (utenti approvati)
-    document.querySelectorAll('.nav-area-soci').forEach(function(el) {
+    // Area Membri links
+    document.querySelectorAll('.nav-area-membri').forEach(function(el) {
       el.classList.toggle('hidden', !isApprovedMember);
     });
-    var areaSection = document.getElementById('area-soci');
+    var areaSection = document.getElementById('area-membri');
     if (areaSection) {
       if (isApprovedMember) {
         areaSection.classList.remove('hidden');
-        renderAreaSoci();
+        renderAreaMembri();
       } else {
         areaSection.classList.add('hidden');
-        clearArea('areaSociContent');
-      }
-    }
-    // Area YUMA links (solo ruolo yuma o admin)
-    document.querySelectorAll('.nav-area-yuma').forEach(function(el) {
-      el.classList.toggle('hidden', !isYuma);
-    });
-    var yumaSection = document.getElementById('area-yuma');
-    if (yumaSection) {
-      if (isYuma) {
-        yumaSection.classList.remove('hidden');
-        renderAreaYuma();
-      } else {
-        yumaSection.classList.add('hidden');
-        clearArea('areaYumaContent');
       }
     }
   } else {
     loggedOut.classList.remove('hidden'); loggedOut.classList.add('flex');
     loggedIn.classList.add('hidden'); loggedIn.classList.remove('flex');
     if (mobOut) mobOut.classList.remove('hidden'); if (mobIn) mobIn.classList.add('hidden');
-    var candidatiOut = document.getElementById('navCandidati');
-    if (candidatiOut) candidatiOut.style.display = '';
-    document.querySelectorAll('.nav-area-soci').forEach(function(el) {
+    document.querySelectorAll('.nav-area-membri').forEach(function(el) {
       el.classList.add('hidden');
     });
-    var areaSection = document.getElementById('area-soci');
+    var areaSection = document.getElementById('area-membri');
     if (areaSection) areaSection.classList.add('hidden');
-    clearArea('areaSociContent');
-    document.querySelectorAll('.nav-area-yuma').forEach(function(el) {
-      el.classList.add('hidden');
-    });
-    var yumaSection = document.getElementById('area-yuma');
-    if (yumaSection) yumaSection.classList.add('hidden');
-    clearArea('areaYumaContent');
   }
 }
 async function handleLogin(e) {
@@ -214,9 +161,16 @@ async function handleLogin(e) {
 }
 async function handleRegister(e) {
   e.preventDefault();
-  var name = document.getElementById('regName').value.trim();
-  var email = document.getElementById('regEmail').value.trim();
-  var password = document.getElementById('regPass').value;
+  var firstName = (document.getElementById('regFirstName') || {}).value || '';
+  var lastName = (document.getElementById('regLastName') || {}).value || '';
+  var nickname = (document.getElementById('regNickname') || {}).value || '';
+  var email = (document.getElementById('regEmail') || {}).value || '';
+  var password = (document.getElementById('regPass') || {}).value || '';
+  var notes = (document.getElementById('regNotes') || {}).value || '';
+  firstName = firstName.trim(); lastName = lastName.trim(); nickname = nickname.trim();
+  email = email.trim(); notes = notes.trim();
+  var displayName = nickname || (firstName + ' ' + lastName).trim() || email.split('@')[0];
+
   var errBox = document.getElementById('registerError'), okBox = document.getElementById('registerSuccess');
   var loading = document.getElementById('registerLoading'), btn = document.getElementById('registerBtn');
   if (errBox) errBox.classList.add('hidden'); if (okBox) okBox.classList.add('hidden');
@@ -230,7 +184,15 @@ async function handleRegister(e) {
     var res = await supabaseClient.auth.signUp({
       email: email,
       password: password,
-      options: { data: { display_name: name } }
+      options: {
+        data: {
+          display_name: displayName,
+          first_name: firstName,
+          last_name: lastName,
+          nickname: nickname,
+          notes: notes
+        }
+      }
     });
     if (loading) loading.classList.add('hidden'); if (btn) btn.disabled = false;
     if (res.error) {
@@ -238,11 +200,19 @@ async function handleRegister(e) {
       return;
     }
     if (res.data && res.data.user) {
-      // La riga in `profiles` viene creata dal trigger handle_new_user() lato DB,
-      // che legge display_name da options.data. Un upsert dal client verrebbe
-      // comunque negato dalla RLS (UPDATE consentito solo all'admin).
+      await supabaseClient.from('profiles').upsert({
+        id: res.data.user.id,
+        email: email,
+        display_name: displayName,
+        first_name: firstName,
+        last_name: lastName,
+        nickname: nickname,
+        notes: notes || null,
+        role: 'pending',
+        status: 'pending'
+      });
       await supabaseClient.auth.signOut();
-      currentUser = null; userProfile = null; isAdmin = false; isYuma = false;
+      currentUser = null; userProfile = null; isAdmin = false;
       updateAuthUI();
     }
     if (okBox) {
@@ -255,10 +225,10 @@ async function handleRegister(e) {
     if (errBox) { errBox.textContent = 'Errore: ' + (err.message || err); errBox.classList.remove('hidden'); }
   }
 }
+
 async function logout() {
   if (supabaseClient) await supabaseClient.auth.signOut();
-  currentUser = null; isAdmin = false; isYuma = false; userProfile = null;
-  areaItemsCache = []; areaItemsLoaded = false;
+  currentUser = null; isAdmin = false; userProfile = null;
   updateAuthUI();
   closeAdminPanel();
 }
@@ -271,43 +241,65 @@ async function loadUsersAdmin() {
   if (activeBox) activeBox.innerHTML = '<p class="text-slate-500 text-xs">Caricamento...</p>';
   var res = await supabaseClient.from('profiles').select('*').order('created_at', { ascending: false });
   if (res.error) {
-    if (pendingBox) pendingBox.innerHTML = '<p class="text-red-400 text-xs">' + escapeHtml(res.error.message) + '</p>';
+    if (pendingBox) pendingBox.innerHTML = '<p class="text-red-400 text-xs">' + res.error.message + '</p>';
     return;
   }
   var all = res.data || [];
   var pending = all.filter(function(p) { return p.status === 'pending'; });
   var active = all.filter(function(p) { return p.status === 'approved' || p.role === 'admin'; });
+
+  function userCard(p, isPending) {
+    var nick = p.nickname || p.display_name || '—';
+    var fullName = ((p.first_name || '') + ' ' + (p.last_name || '')).trim() || '—';
+    var initial = (nick || fullName || p.email || '?').charAt(0).toUpperCase();
+    var dateStr = p.created_at ? new Date(p.created_at).toLocaleDateString('it-IT') : '';
+    var roleLabel = p.role === 'admin' ? 'Admin' : (p.role === 'yuma' ? 'YUMA' : (p.role === 'socio' ? 'Socio' : 'In attesa'));
+    var roleColor = p.role === 'admin' ? 'bg-amber-500/20 text-amber-300 border-amber-500/40' :
+                    p.role === 'yuma' ? 'bg-sky-500/20 text-sky-300 border-sky-500/40' :
+                    p.role === 'socio' ? 'bg-emerald-500/20 text-emerald-300 border-emerald-500/40' :
+                    'bg-slate-500/20 text-slate-300 border-slate-500/40';
+    var actions = '';
+    if (isPending) {
+      actions = '<div class="flex flex-wrap gap-1.5 mt-3">' +
+        '<button type="button" onclick="approveUser(\'' + p.id + '\',\'yuma\')" class="px-2.5 py-1 rounded-lg bg-sky-500/20 text-sky-300 border border-sky-500/30 text-[11px] font-semibold hover:bg-sky-500/30">Approva YUMA</button>' +
+        '<button type="button" onclick="approveUser(\'' + p.id + '\',\'socio\')" class="px-2.5 py-1 rounded-lg bg-emerald-500/20 text-emerald-300 border border-emerald-500/30 text-[11px] font-semibold hover:bg-emerald-500/30">Approva Socio</button>' +
+        '<button type="button" onclick="rejectUser(\'' + p.id + '\')" class="px-2.5 py-1 rounded-lg bg-red-500/15 text-red-300 border border-red-500/30 text-[11px] font-semibold hover:bg-red-500/25">Rifiuta</button>' +
+      '</div>';
+    } else if (p.role !== 'admin') {
+      actions = '<div class="flex items-center gap-2 mt-3">' +
+        '<select onchange="changeUserRole(\'' + p.id + '\', this.value)" class="bg-slate-800 border border-slate-600 rounded-lg text-[11px] text-slate-300 px-2 py-1">' +
+          '<option value="yuma"' + (p.role==='yuma'?' selected':'') + '>YUMA</option>' +
+          '<option value="socio"' + (p.role==='socio'?' selected':'') + '>Socio</option>' +
+        '</select></div>';
+    }
+    return '<div class="border border-slate-700/80 rounded-xl p-3.5 bg-slate-900/40 ' + (isPending ? 'border-amber-500/25 bg-amber-500/5' : '') + '">' +
+      '<div class="flex gap-3">' +
+        '<div class="w-11 h-11 rounded-full bg-gradient-to-br from-sky-500/30 to-blue-700/20 border border-sky-400/30 flex items-center justify-center font-orbitron font-bold text-sky-300 text-sm shrink-0">' + escapeHtml(initial) + '</div>' +
+        '<div class="min-w-0 flex-1">' +
+          '<div class="flex flex-wrap items-center gap-2">' +
+            '<span class="text-white font-bold text-sm truncate">' + escapeHtml(nick) + '</span>' +
+            '<span class="text-[10px] uppercase tracking-wider font-semibold px-1.5 py-0.5 rounded border ' + roleColor + '">' + roleLabel + '</span>' +
+          '</div>' +
+          '<div class="text-slate-300 text-xs mt-0.5">' + escapeHtml(fullName) + '</div>' +
+          '<div class="text-sky-400/90 text-xs mt-0.5 truncate">' + escapeHtml(p.email || '') + '</div>' +
+          (p.notes ? '<div class="text-slate-400 text-[11px] mt-1.5 italic border-l-2 border-slate-600 pl-2">' + escapeHtml(p.notes) + '</div>' : '') +
+          (dateStr ? '<div class="text-slate-600 text-[10px] mt-1.5">' + dateStr + '</div>' : '') +
+          actions +
+        '</div>' +
+      '</div>' +
+    '</div>';
+  }
+
   if (pendingBox) {
     if (!pending.length) pendingBox.innerHTML = '<p class="text-slate-500 text-xs">Nessuna richiesta in attesa.</p>';
-    else pendingBox.innerHTML = pending.map(function(p) {
-      return '<div class="border border-amber-500/30 rounded-lg p-2.5 text-xs bg-amber-500/5">' +
-        '<div class="font-semibold text-white">' + escapeHtml(p.display_name || p.email) + '</div>' +
-        '<div class="text-slate-400 mt-0.5">' + escapeHtml(p.email) + '</div>' +
-        '<div class="flex flex-wrap gap-1.5 mt-2">' +
-          '<button type="button" onclick="approveUser(\'' + p.id + '\',\'yuma\')" class="px-2 py-1 rounded bg-sky-500/20 text-sky-300 border border-sky-500/30">Approva YUMA</button>' +
-          '<button type="button" onclick="approveUser(\'' + p.id + '\',\'socio\')" class="px-2 py-1 rounded bg-emerald-500/20 text-emerald-300 border border-emerald-500/30">Approva Socio</button>' +
-          '<button type="button" onclick="rejectUser(\'' + p.id + '\')" class="px-2 py-1 rounded bg-red-500/15 text-red-300 border border-red-500/30">Rifiuta</button>' +
-        '</div></div>';
-    }).join('');
+    else pendingBox.innerHTML = '<div class="space-y-2.5">' + pending.map(function(p) { return userCard(p, true); }).join('') + '</div>';
   }
   if (activeBox) {
     if (!active.length) activeBox.innerHTML = '<p class="text-slate-500 text-xs">Nessun utente attivo.</p>';
-    else activeBox.innerHTML = active.map(function(p) {
-      var roleLabel = p.role === 'admin' ? 'Admin' : (p.role === 'yuma' ? 'YUMA' : (p.role === 'socio' ? 'Socio' : p.role));
-      var roleColor = p.role === 'admin' ? 'text-amber-400' : (p.role === 'yuma' ? 'text-sky-400' : 'text-emerald-400');
-      return '<div class="border border-slate-700 rounded-lg p-2.5 text-xs flex justify-between items-center gap-2">' +
-        '<div><div class="text-white font-semibold">' + escapeHtml(p.display_name || p.email) + '</div>' +
-        '<div class="text-slate-500">' + escapeHtml(p.email) + '</div></div>' +
-        '<div class="flex items-center gap-2">' +
-          '<span class="' + roleColor + ' font-bold text-[10px] uppercase">' + roleLabel + '</span>' +
-          (p.role !== 'admin' ? '<select onchange="changeUserRole(\'' + p.id + '\', this.value)" class="bg-slate-800 border border-slate-600 rounded text-[10px] text-slate-300 px-1 py-0.5">' +
-            '<option value="yuma"' + (p.role==='yuma'?' selected':'') + '>YUMA</option>' +
-            '<option value="socio"' + (p.role==='socio'?' selected':'') + '>Socio</option>' +
-          '</select>' : '') +
-        '</div></div>';
-    }).join('');
+    else activeBox.innerHTML = '<div class="space-y-2.5">' + active.map(function(p) { return userCard(p, false); }).join('') + '</div>';
   }
 }
+
 async function approveUser(id, role) {
   if (!isAdmin || !supabaseClient) return;
   if (!id) { alert('ID utente mancante.'); return; }
@@ -542,7 +534,7 @@ async function loadCandidatureList() {
   if (!box || !isAdmin || !supabaseClient) return;
   box.innerHTML = '<p class="text-slate-500 text-xs">Caricamento...</p>';
   var res = await supabaseClient.from('candidature').select('*').order('created_at', { ascending: false }).limit(50);
-  if (res.error) { box.innerHTML = '<p class="text-red-400 text-xs">' + escapeHtml(res.error.message) + '</p>'; return; }
+  if (res.error) { box.innerHTML = '<p class="text-red-400 text-xs">' + res.error.message + '</p>'; return; }
   if (!res.data || !res.data.length) { box.innerHTML = '<p class="text-slate-500 text-xs">Nessuna candidatura.</p>'; return; }
   box.innerHTML = res.data.map(function(c) {
     var actions = '';
@@ -590,72 +582,15 @@ async function loadApprovedMembers() {
   } catch (e) { return []; }
 }
 
-/* -------------------------------------------------------------------
-   CONTENUTI DELLE AREE (tabella `downloads`)
-   Li pubblica solo l'admin dal pannello (tab "Aree"); le due aree li
-   leggono filtrando per `area` ('soci' | 'yuma'). La RLS fa il resto:
-   vedi supabase/101-downloads.sql.
-   ------------------------------------------------------------------- */
-function safeUrl(u) {
-  var s = String(u || '').trim();
-  return /^https?:\/\//i.test(s) ? s : '';
-}
-const SOCI_ACCENT = { title: 'text-emerald-400', badge: 'border-emerald-500/40 text-emerald-300 bg-emerald-500/10', border: 'border-emerald-500/20' };
-const YUMA_ACCENT = { title: 'text-amber-400', badge: 'border-amber-500/40 text-amber-300 bg-amber-500/10', border: 'border-amber-500/20' };
-function areaItems(area) {
-  return (areaItemsCache || [])
-    .filter(function(d) { return d.area === area; })
-    .sort(function(a, b) {
-      return ((a.sort_order || 0) - (b.sort_order || 0)) || ((a.id || 0) - (b.id || 0));
-    });
-}
-async function loadAreaItems() {
-  if (!supabaseClient) { areaItemsCache = []; areaItemsLoaded = true; return areaItemsCache; }
-  try {
-    var res = await supabaseClient.from('area_items').select('*')
-      .order('sort_order', { ascending: true }).order('id', { ascending: true });
-    areaItemsCache = (!res.error && res.data) ? res.data : [];
-  } catch (e) {
-    areaItemsCache = [];
-  }
-  areaItemsLoaded = true;
-  return areaItemsCache;
-}
-// Schede che l'admin pubblica dentro un'area. Ogni voce = una scheda:
-// titolo, testo (anche multi-riga) e link facoltativo.
-function areaItemsHtml(area, accent) {
-  var _t = typeof t === 'function' ? t : function(k) { return k; };
-  var items = areaItems(area);
-
-  if (!items.length) {
-    return '<div class="glass-card p-5 rounded-2xl ' + accent.border + '">' +
-      '<p class="text-slate-500 text-xs">' + escapeHtml(_t('area_empty')) + '</p>' +
-    '</div>';
-  }
-
-  return '<div class="grid gap-4 sm:grid-cols-2">' + items.map(function(d) {
-    var href = safeUrl(d.url);
-    var body = d.testo ? '<p class="text-slate-300 text-sm mt-2 whitespace-pre-line break-words">' + escapeHtml(d.testo) + '</p>' : '';
-    var open = href ? '<span class="shrink-0 text-[10px] font-bold uppercase px-2 py-0.5 rounded border ' + accent.badge + '">' + escapeHtml(_t('area_open')) + '</span>' : '';
-    var head = '<div class="flex items-start justify-between gap-2">' +
-        '<div class="text-xs font-semibold uppercase tracking-wider ' + accent.title + ' break-words">' + escapeHtml(d.titolo || '') + '</div>' + open +
-      '</div>';
-    var cls = 'glass-card p-5 rounded-2xl border ' + accent.border + ' block transition';
-    return href
-      ? '<a href="' + escapeHtml(href) + '" target="_blank" rel="noopener noreferrer" class="' + cls + ' hover:bg-slate-800/40">' + head + body + '</a>'
-      : '<div class="' + cls + '">' + head + body + '</div>';
-  }).join('') + '</div>';
-}
-
-function renderAreaSoci() {
+function renderAreaMembri() {
   var _t = typeof t === 'function' ? t : function(k, v) {
     var s = k;
     if (v && v.name) s = 'Benvenuto a bordo, ' + v.name + '!';
     return s;
   };
-  var box = document.getElementById('areaSociContent');
+  var box = document.getElementById('areaMembriContent');
   if (!box) return;
-  var name = displayName() || 'Membro';
+  var name = (userProfile && userProfile.display_name) || (currentUser && currentUser.email) || 'Membro';
   var role = (userProfile && userProfile.role) || 'membro';
   var roleLabel = role === 'admin' ? 'Admin' : (role === 'yuma' ? 'YUMA' : (role === 'socio' ? 'Socio' : role));
   var roleColor = role === 'admin' ? 'text-amber-400 border-amber-500/40 bg-amber-500/10' :
@@ -669,25 +604,32 @@ function renderAreaSoci() {
     '<h3 class="text-2xl md:text-3xl font-black font-orbitron text-white">' + escapeHtml(_t('area_welcome', {name: name})) + '</h3>' +
     '<p class="text-slate-400 mt-2 text-sm md:text-base">' + escapeHtml(_t('area_welcome_sub')) + '</p>' +
   '</div>' +
-  '<div class="glass-card p-5 rounded-2xl border border-sky-500/20 mb-8">' +
-    '<div class="text-sky-400 text-xs font-semibold uppercase tracking-wider mb-1">' + escapeHtml(_t('area_role')) + '</div>' +
-    '<div class="text-xl font-bold font-orbitron text-white">' + escapeHtml(roleLabel) + '</div>' +
-    '<p class="text-slate-400 text-xs mt-2">' +
-      (role === 'yuma' ? _t('area_role_yuma') :
-       role === 'socio' ? _t('area_role_socio') :
-       _t('area_role_admin')) +
-    '</p>' +
+  '<div class="grid sm:grid-cols-2 gap-4 mb-8">' +
+    '<div class="glass-card p-5 rounded-2xl border border-sky-500/20">' +
+      '<div class="text-sky-400 text-xs font-semibold uppercase tracking-wider mb-1">' + escapeHtml(_t('area_role')) + '</div>' +
+      '<div class="text-xl font-bold font-orbitron text-white">' + escapeHtml(roleLabel) + '</div>' +
+      '<p class="text-slate-400 text-xs mt-2">' +
+        (role === 'yuma' ? _t('area_role_yuma') :
+         role === 'socio' ? _t('area_role_socio') :
+         _t('area_role_admin')) +
+      '</p>' +
+    '</div>' +
+    '<div class="glass-card p-5 rounded-2xl border border-amber-500/20">' +
+      '<div class="text-amber-400 text-xs font-semibold uppercase tracking-wider mb-1">' + escapeHtml(_t('area_next')) + '</div>' +
+      '<ul class="text-slate-300 text-sm space-y-1.5 mt-2">' +
+        '<li>' + escapeHtml(_t('area_next1')) + '</li>' +
+        '<li>' + escapeHtml(_t('area_next2')) + '</li>' +
+        '<li>' + escapeHtml(_t('area_next3')) + '</li>' +
+      '</ul>' +
+    '</div>' +
   '</div>' +
-  '<div id="areaSociItems" class="mb-8">' +
-    areaItemsHtml('soci', SOCI_ACCENT) +
-  '</div>' +
-  '<div id="areaSociList" class="glass-card p-5 rounded-2xl">' +
+  '<div id="areaMembriList" class="glass-card p-5 rounded-2xl">' +
     '<h4 class="text-sm font-semibold text-slate-300 uppercase tracking-wider mb-3">' + escapeHtml(_t('area_members')) + '</h4>' +
     '<p class="text-slate-500 text-xs">Caricamento...</p>' +
   '</div>';
 
   loadApprovedMembers().then(function(list) {
-    var listBox = document.getElementById('areaSociList');
+    var listBox = document.getElementById('areaMembriList');
     if (!listBox) return;
     if (!list.length) {
       listBox.innerHTML = '<h4 class="text-sm font-semibold text-slate-300 uppercase tracking-wider mb-3">' + escapeHtml(_t('area_members')) + '</h4><p class="text-slate-500 text-xs">' + escapeHtml(_t('area_members_none')) + '</p>';
@@ -699,161 +641,13 @@ function renderAreaSoci() {
         var r = p.role === 'admin' ? 'Admin' : (p.role === 'yuma' ? 'YUMA' : 'Socio');
         var col = p.role === 'admin' ? 'border-amber-500/30 text-amber-300' : (p.role === 'yuma' ? 'border-sky-500/30 text-sky-300' : 'border-emerald-500/30 text-emerald-300');
         return '<span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg border text-xs bg-slate-900/60 ' + col + '">' +
-          escapeHtml(prettyName(p.display_name || p.email) || '?') +
+          escapeHtml(p.display_name || p.email || '?') +
           '<span class="opacity-60 text-[10px]">' + r + '</span></span>';
       }).join('') +
       '</div>';
   });
-
-  // Contenuti dell'area: se non ancora caricati, arriva qui il refresh
-  if (!areaItemsLoaded) loadAreaItems().then(function() {
-    var dlBox = document.getElementById('areaSociItems');
-    if (dlBox) dlBox.innerHTML = areaItemsHtml('soci', SOCI_ACCENT);
-  });
 }
 
-
-/* ---------------------------------------------------------------
-   AREA YUMA – visibile solo al ruolo 'yuma' (e agli admin).
-   Nota: qui la visibilità è solo lato UI. La protezione reale dei
-   contenuti riservati va fatta con le policy RLS, vedi
-   supabase/100-aree-riservate.sql.
-   --------------------------------------------------------------- */
-function renderAreaYuma() {
-  var box = document.getElementById('areaYumaContent');
-  if (!box) return;
-  if (!isYuma) { box.innerHTML = ''; return; }
-  var _t = typeof t === 'function' ? t : function(k, v) {
-    var s = k;
-    if (v && v.name) s = 'Benvenuto in equipaggio, ' + v.name + '!';
-    return s;
-  };
-  var name = displayName() || 'Membro YUMA';
-
-  box.innerHTML = '<div class="text-center mb-8">' +
-      '<div class="inline-flex items-center gap-2 px-4 py-1.5 rounded-full border border-amber-500/40 bg-amber-500/10 text-amber-300 text-sm font-semibold mb-4">' +
-        '<span class="w-2 h-2 rounded-full bg-current"></span> YUMA' +
-      '</div>' +
-      '<h3 class="text-2xl md:text-3xl font-black font-orbitron text-white">' + escapeHtml(_t('yuma_welcome', {name: name})) + '</h3>' +
-      '<p class="text-slate-400 mt-2 text-sm md:text-base">' + escapeHtml(_t('yuma_welcome_sub')) + '</p>' +
-    '</div>' +
-    '<div id="areaYumaItems" class="mb-8">' + areaItemsHtml('yuma', YUMA_ACCENT) + '</div>' +
-    '<div id="areaYumaList" class="glass-card p-5 rounded-2xl">' +
-      '<h4 class="text-sm font-semibold text-slate-300 uppercase tracking-wider mb-3">' + escapeHtml(_t('yuma_roster')) + '</h4>' +
-      '<p class="text-slate-500 text-xs">' + escapeHtml(_t('roster_loading')) + '</p>' +
-    '</div>';
-
-  loadApprovedMembers().then(function(list) {
-    var listBox = document.getElementById('areaYumaList');
-    if (!listBox || !isYuma) return;
-    var crew = (list || []).filter(function(p) { return p.role === 'yuma' || p.role === 'admin'; });
-    var head = '<h4 class="text-sm font-semibold text-slate-300 uppercase tracking-wider mb-3">' +
-      escapeHtml(_t('yuma_roster')) + (crew.length ? ' (' + crew.length + ')' : '') + '</h4>';
-    if (!crew.length) {
-      listBox.innerHTML = head + '<p class="text-slate-500 text-xs">' + escapeHtml(_t('yuma_roster_none')) + '</p>';
-      return;
-    }
-    listBox.innerHTML = head +
-      '<div class="flex flex-wrap gap-2">' +
-      crew.map(function(p) {
-        return '<span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg border text-xs bg-slate-900/60 border-amber-500/30 text-amber-300">' +
-          escapeHtml(prettyName(p.display_name || p.email) || '?') +
-          '<span class="opacity-60 text-[10px]">' + (p.role === 'admin' ? 'Admin' : 'YUMA') + '</span></span>';
-      }).join('') +
-      '</div>';
-  });
-
-  if (!areaItemsLoaded) loadAreaItems().then(function() {
-    var dlBox = document.getElementById('areaYumaItems');
-    if (dlBox) dlBox.innerHTML = areaItemsHtml('yuma', YUMA_ACCENT);
-  });
-}
-
-/* -------------------------------------------------------------------
-   ADMIN – gestione dei contenuti delle due aree (tab "Aree")
-   Le scritture sono consentite solo all'admin anche dalle policy RLS.
-   ------------------------------------------------------------------- */
-function renderAdminAreaItems() {
-  ['soci', 'yuma'].forEach(function(area) {
-    var box = document.getElementById(area === 'soci' ? 'adminAreaSoci' : 'adminAreaYuma');
-    if (!box) return;
-    var items = areaItems(area);
-    if (!items.length) {
-      box.innerHTML = '<p class="text-slate-500 text-xs">Nessun contenuto. Aggiungine uno qui sotto.</p>';
-      return;
-    }
-    box.innerHTML = items.map(function(d) {
-      return '<div class="border border-slate-700 rounded-xl p-3 space-y-2" data-item="' + d.id + '">' +
-        '<input type="text" value="' + escapeHtml(d.titolo || '') + '" data-field="titolo" class="auth-input text-xs" placeholder="Titolo della scheda">' +
-        '<textarea rows="3" data-field="testo" class="auth-input text-xs" placeholder="Testo della scheda (una riga per punto)">' + escapeHtml(d.testo || '') + '</textarea>' +
-        '<input type="url" value="' + escapeHtml(d.url || '') + '" data-field="url" class="auth-input text-xs" placeholder="Link (facoltativo) https://...">' +
-        '<div class="flex items-center gap-2">' +
-          '<input type="number" value="' + (d.sort_order || 0) + '" data-field="sort_order" class="auth-input text-xs" title="Ordine" style="max-width:84px">' +
-          '<label class="flex items-center gap-1.5 text-[11px] text-slate-400"><input type="checkbox" data-field="pubblicato" ' + (d.pubblicato === false ? '' : 'checked') + '> visibile</label>' +
-          '<button type="button" onclick="saveAreaItem(' + d.id + ')" class="btn-secondary text-[11px] px-3 py-1.5 flex-1">Salva</button>' +
-          '<button type="button" onclick="deleteAreaItem(' + d.id + ')" class="text-red-400 text-[11px] px-3 py-1.5 border border-red-500/30 rounded-lg">Elimina</button>' +
-        '</div>' +
-      '</div>';
-    }).join('');
-  });
-}
-// Ricarica dal DB e riallinea admin + aree visibili
-async function refreshAreaItems() {
-  areaItemsLoaded = false;
-  await loadAreaItems();
-  renderAdminAreaItems();
-  var sociSection = document.getElementById('area-soci');
-  if (sociSection && !sociSection.classList.contains('hidden')) renderAreaSoci();
-  var yumaSection = document.getElementById('area-yuma');
-  if (yumaSection && !yumaSection.classList.contains('hidden')) renderAreaYuma();
-}
-async function addAreaItem(area) {
-  if (!isAdmin || !supabaseClient) return;
-  var p = area === 'soci' ? 'new-item-soci-' : 'new-item-yuma-';
-  var titoloEl = document.getElementById(p + 'titolo');
-  var testoEl = document.getElementById(p + 'testo');
-  var urlEl = document.getElementById(p + 'url');
-  var titolo = ((titoloEl && titoloEl.value) || '').trim();
-  if (!titolo) { alert('Inserisci un titolo.'); return; }
-  var maxOrder = areaItems(area).reduce(function(mx, d) { return Math.max(mx, d.sort_order || 0); }, 0);
-  var res = await supabaseClient.from('area_items').insert({
-    area: area,
-    titolo: titolo,
-    testo: ((testoEl && testoEl.value) || '').trim() || null,
-    url: ((urlEl && urlEl.value) || '').trim() || null,
-    sort_order: maxOrder + 1,
-    pubblicato: true,
-    created_by: currentUser ? currentUser.id : null
-  });
-  if (res.error) { alert('Errore: ' + res.error.message); return; }
-  if (titoloEl) titoloEl.value = '';
-  if (testoEl) testoEl.value = '';
-  if (urlEl) urlEl.value = '';
-  await refreshAreaItems();
-}
-async function saveAreaItem(id) {
-  if (!isAdmin || !supabaseClient) return;
-  var card = document.querySelector('[data-item="' + id + '"]');
-  if (!card) return;
-  var payload = {};
-  card.querySelectorAll('[data-field]').forEach(function(inp) {
-    var f = inp.getAttribute('data-field');
-    if (f === 'sort_order') { payload[f] = parseInt(inp.value, 10) || 0; return; }
-    if (f === 'pubblicato') { payload[f] = !!inp.checked; return; }
-    payload[f] = (inp.value || '').trim() || null;
-  });
-  if (!payload.titolo) { alert('Titolo obbligatorio.'); return; }
-  var res = await supabaseClient.from('area_items').update(payload).eq('id', id);
-  if (res.error) { alert('Errore: ' + res.error.message); return; }
-  await refreshAreaItems();
-}
-async function deleteAreaItem(id) {
-  if (!isAdmin || !supabaseClient) return;
-  if (!confirm('Eliminare questa scheda dall\'area?')) return;
-  var res = await supabaseClient.from('area_items').delete().eq('id', id);
-  if (res.error) { alert('Errore: ' + res.error.message); return; }
-  await refreshAreaItems();
-}
 
 document.addEventListener('DOMContentLoaded', async function() {
   // i18n init
