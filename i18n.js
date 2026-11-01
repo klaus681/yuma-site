@@ -2,6 +2,15 @@
 /* ========== i18n: IT / EN / ES / FR ========== */
 var I18N = {
   it: {
+    nav_area_soci: "Area Soci",
+    nav_area_yuma: "YUMA Only",
+    area_soci_label: "Community",
+    area_soci_title: "Area Soci",
+    area_soci_desc: "Il tuo spazio nella community YUMA come Socio.",
+    area_soci_welcome_sub: "Sei parte della community YUMA come Socio.",
+    area_yuma_label: "Solo YUMA",
+    area_yuma_title: "YUMA Only",
+    area_yuma_desc: "Area riservata ai membri del team YUMA.",
     nav_home: "Home",
     nav_storia: "La Storia",
     nav_trofei: "Trofei",
@@ -96,6 +105,15 @@ var I18N = {
     lang_label: "Lingua"
   },
   en: {
+    nav_area_soci: "Members Area",
+    nav_area_yuma: "YUMA Only",
+    area_soci_label: "Community",
+    area_soci_title: "Members Area",
+    area_soci_desc: "Your space in the YUMA community as a member.",
+    area_soci_welcome_sub: "You are part of the YUMA community as a member.",
+    area_yuma_label: "YUMA Only",
+    area_yuma_title: "YUMA Only",
+    area_yuma_desc: "Reserved area for YUMA team members.",
     nav_home: "Home",
     nav_storia: "History",
     nav_trofei: "Trophies",
@@ -190,6 +208,15 @@ var I18N = {
     lang_label: "Language"
   },
   es: {
+    nav_area_soci: "Área Socios",
+    nav_area_yuma: "YUMA Only",
+    area_soci_label: "Community",
+    area_soci_title: "Área Socios",
+    area_soci_desc: "Tu espacio en la comunidad YUMA como socio.",
+    area_soci_welcome_sub: "Formas parte de la comunidad YUMA como socio.",
+    area_yuma_label: "Solo YUMA",
+    area_yuma_title: "YUMA Only",
+    area_yuma_desc: "Área reservada a miembros del equipo YUMA.",
     nav_home: "Inicio",
     nav_storia: "Historia",
     nav_trofei: "Trofeos",
@@ -284,6 +311,15 @@ var I18N = {
     lang_label: "Idioma"
   },
   fr: {
+    nav_area_soci: "Espace Membres",
+    nav_area_yuma: "YUMA Only",
+    area_soci_label: "Community",
+    area_soci_title: "Espace Membres",
+    area_soci_desc: "Votre espace dans la communauté YUMA en tant que membre.",
+    area_soci_welcome_sub: "Vous faites partie de la communauté YUMA en tant que membre.",
+    area_yuma_label: "YUMA Only",
+    area_yuma_title: "YUMA Only",
+    area_yuma_desc: "Espace réservé aux membres de l'équipe YUMA.",
     nav_home: "Accueil",
     nav_storia: "Histoire",
     nav_trofei: "Trophées",

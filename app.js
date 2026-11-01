@@ -86,41 +86,57 @@ function updateAuthUI() {
   var loggedOut = document.getElementById('authLoggedOut'), loggedIn = document.getElementById('authLoggedIn');
   var mobOut = document.getElementById('mobileAuthOut'), mobIn = document.getElementById('mobileAuthIn');
   if (!loggedOut || !loggedIn) return;
-  var isApprovedMember = !!(currentUser && (isAdmin || (userProfile && userProfile.role === 'yuma' && (userProfile.status === 'approved' || !userProfile.status))));
+
+  var role = (userProfile && userProfile.role) || '';
+  var status = (userProfile && userProfile.status) || '';
+  var isApproved = status === 'approved' || role === 'admin' || isAdmin;
+  // Area Soci: socio approvato (o admin)
+  var canSeeSoci = !!(currentUser && (isAdmin || (isApproved && role === 'socio')));
+  // YUMA Only: yuma approvato (o admin)
+  var canSeeYuma = !!(currentUser && (isAdmin || (isApproved && role === 'yuma')));
+
   if (currentUser) {
     loggedOut.classList.add('hidden'); loggedOut.classList.remove('flex');
     loggedIn.classList.remove('hidden'); loggedIn.classList.add('flex');
     if (mobOut) mobOut.classList.add('hidden'); if (mobIn) mobIn.classList.remove('hidden');
     var label = document.getElementById('userEmailLabel');
-    var name = (userProfile && userProfile.display_name) || currentUser.email || 'Utente';
+    var name = (userProfile && (userProfile.nickname || userProfile.display_name)) || currentUser.email || 'Utente';
     if (label) label.textContent = name;
     document.querySelectorAll('[onclick*="openAdminPanel"]').forEach(function(b) {
       b.style.display = isAdmin ? '' : 'none';
     });
-    // YUMA Only links
-    document.querySelectorAll('.nav-area-membri').forEach(function(el) {
-      el.classList.toggle('hidden', !isApprovedMember);
+
+    document.querySelectorAll('.nav-area-soci').forEach(function(el) {
+      el.classList.toggle('hidden', !canSeeSoci);
     });
-    var areaSection = document.getElementById('area-membri');
-    if (areaSection) {
-      if (isApprovedMember) {
-        areaSection.classList.remove('hidden');
-        renderAreaMembri();
-      } else {
-        areaSection.classList.add('hidden');
-      }
+    document.querySelectorAll('.nav-area-yuma, .nav-area-membri').forEach(function(el) {
+      el.classList.toggle('hidden', !canSeeYuma);
+    });
+
+    var sociSec = document.getElementById('area-soci');
+    if (sociSec) {
+      if (canSeeSoci) { sociSec.classList.remove('hidden'); renderAreaSoci(); }
+      else sociSec.classList.add('hidden');
+    }
+    var yumaSec = document.getElementById('area-yuma') || document.getElementById('area-membri');
+    if (yumaSec) {
+      if (canSeeYuma) { yumaSec.classList.remove('hidden'); renderAreaYuma(); }
+      else yumaSec.classList.add('hidden');
     }
   } else {
     loggedOut.classList.remove('hidden'); loggedOut.classList.add('flex');
     loggedIn.classList.add('hidden'); loggedIn.classList.remove('flex');
     if (mobOut) mobOut.classList.remove('hidden'); if (mobIn) mobIn.classList.add('hidden');
-    document.querySelectorAll('.nav-area-membri').forEach(function(el) {
+    document.querySelectorAll('.nav-area-soci, .nav-area-yuma, .nav-area-membri').forEach(function(el) {
       el.classList.add('hidden');
     });
-    var areaSection = document.getElementById('area-membri');
-    if (areaSection) areaSection.classList.add('hidden');
+    var sociSec = document.getElementById('area-soci');
+    if (sociSec) sociSec.classList.add('hidden');
+    var yumaSec = document.getElementById('area-yuma') || document.getElementById('area-membri');
+    if (yumaSec) yumaSec.classList.add('hidden');
   }
 }
+
 async function handleLogin(e) {
   e.preventDefault();
   var email = document.getElementById('loginEmail').value.trim();
@@ -658,13 +674,50 @@ async function loadApprovedMembers() {
   } catch (e) { return []; }
 }
 
-function renderAreaMembri() {
+
+function renderAreaSoci() {
+  var _t = typeof t === 'function' ? t : function(k, v) {
+    if (k === 'area_welcome' && v && v.name) return 'Benvenuto, ' + v.name + '!';
+    return k;
+  };
+  var box = document.getElementById('areaSociContent');
+  if (!box) return;
+  var name = (userProfile && (userProfile.nickname || userProfile.display_name)) || (currentUser && currentUser.email) || 'Socio';
+  var fullName = ((userProfile && userProfile.first_name) || '') + ' ' + ((userProfile && userProfile.last_name) || '');
+  fullName = fullName.trim();
+
+  box.innerHTML = '<div class="text-center mb-8">' +
+    '<div class="inline-flex items-center gap-2 px-4 py-1.5 rounded-full border text-sm font-semibold mb-4 text-emerald-400 border-emerald-500/40 bg-emerald-500/10">' +
+      '<span class="w-2 h-2 rounded-full bg-current"></span> Socio' +
+    '</div>' +
+    '<h3 class="text-2xl md:text-3xl font-black font-orbitron text-white">' + escapeHtml(_t('area_welcome', {name: name})) + '</h3>' +
+    (fullName ? '<p class="text-slate-400 mt-1 text-sm">' + escapeHtml(fullName) + '</p>' : '') +
+    '<p class="text-slate-400 mt-2 text-sm md:text-base">' + escapeHtml(_t('area_soci_welcome_sub') || 'Sei parte della community YUMA come Socio.') + '</p>' +
+  '</div>' +
+  '<div class="grid sm:grid-cols-2 gap-4">' +
+    '<div class="glass-card p-5 rounded-2xl border border-emerald-500/20">' +
+      '<div class="text-emerald-400 text-xs font-semibold uppercase tracking-wider mb-1">' + escapeHtml(_t('area_role') || 'Il tuo ruolo') + '</div>' +
+      '<div class="text-xl font-bold font-orbitron text-white">Socio</div>' +
+      '<p class="text-slate-400 text-xs mt-2">' + escapeHtml(_t('area_role_socio') || 'Socio della community – supporto e passione per la vela virtuale.') + '</p>' +
+    '</div>' +
+    '<div class="glass-card p-5 rounded-2xl border border-amber-500/20">' +
+      '<div class="text-amber-400 text-xs font-semibold uppercase tracking-wider mb-1">' + escapeHtml(_t('area_next') || 'Prossimi passi') + '</div>' +
+      '<ul class="text-slate-300 text-sm space-y-1.5 mt-2">' +
+        '<li>' + escapeHtml(_t('area_next1') || '• Unisciti al canale Discord del team') + '</li>' +
+        '<li>' + escapeHtml(_t('area_next2') || '• Partecipa alle regate e agli allenamenti') + '</li>' +
+        '<li>' + escapeHtml(_t('area_next3') || '• Contatta un admin per qualsiasi dubbio') + '</li>' +
+      '</ul>' +
+    '</div>' +
+  '</div>';
+}
+
+function renderAreaYuma() {
   var _t = typeof t === 'function' ? t : function(k, v) {
     var s = k;
     if (v && v.name) s = 'Benvenuto a bordo, ' + v.name + '!';
     return s;
   };
-  var box = document.getElementById('areaMembriContent');
+  var box = document.getElementById('areaYumaContent');
   if (!box) return;
   var name = (userProfile && userProfile.display_name) || (currentUser && currentUser.email) || 'Membro';
   var role = (userProfile && userProfile.role) || 'membro';
@@ -699,13 +752,13 @@ function renderAreaMembri() {
       '</ul>' +
     '</div>' +
   '</div>' +
-  '<div id="areaMembriList" class="glass-card p-5 rounded-2xl">' +
+  '<div id="areaYumaList" class="glass-card p-5 rounded-2xl">' +
     '<h4 class="text-sm font-semibold text-slate-300 uppercase tracking-wider mb-3">' + escapeHtml(_t('area_members')) + '</h4>' +
     '<p class="text-slate-500 text-xs">Caricamento...</p>' +
   '</div>';
 
   loadApprovedMembers().then(function(list) {
-    var listBox = document.getElementById('areaMembriList');
+    var listBox = document.getElementById('areaYumaList');
     if (!listBox) return;
     if (!list.length) {
       listBox.innerHTML = '<h4 class="text-sm font-semibold text-slate-300 uppercase tracking-wider mb-3">' + escapeHtml(_t('area_members')) + '</h4><p class="text-slate-500 text-xs">' + escapeHtml(_t('area_members_none')) + '</p>';
