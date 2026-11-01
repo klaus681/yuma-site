@@ -1,6 +1,6 @@
 const SUPABASE_URL = 'https://eefszkqpfwwxoljauobs.supabase.co';
 const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImVlZnN6a3FwZnd3eG9samF1b2JzIiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTMzNjI4MTMsImV4cCI6MjEwODkzODgxM30.xak6904GHCnq4LSJsfNdNGGZeNa7ObRsV6NhfyFE2Zs';
-let supabaseClient = null, currentUser = null, isAdmin = false, userProfile = null, membersCache = [];
+let supabaseClient = null, currentUser = null, isAdmin = false, userProfile = null, membersCache = [], adminUsersCache = [];
 try {
   if (window.supabase && window.supabase.createClient)
     supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
@@ -233,6 +233,93 @@ async function logout() {
   closeAdminPanel();
 }
 
+
+function closeUserDetail() {
+  var m = document.getElementById('userDetailModal');
+  if (!m) return;
+  m.classList.add('hidden'); m.classList.remove('flex');
+}
+function openUserDetail(id) {
+  if (!isAdmin) return;
+  var p = (adminUsersCache || []).find(function(u) { return u.id === id; });
+  if (!p) { alert('Utente non trovato.'); return; }
+  var set = function(i, v) { var el = document.getElementById(i); if (el) el.value = v != null ? v : ''; };
+  set('udId', p.id);
+  set('udFirstName', p.first_name || '');
+  set('udLastName', p.last_name || '');
+  set('udNickname', p.nickname || p.display_name || '');
+  set('udEmail', p.email || '');
+  set('udRole', p.role || 'pending');
+  set('udStatus', p.status || 'pending');
+  set('udNotes', p.notes || '');
+  var nick = p.nickname || p.display_name || p.email || '?';
+  var av = document.getElementById('udAvatar');
+  if (av) av.textContent = String(nick).charAt(0).toUpperCase();
+  var title = document.getElementById('udTitle');
+  if (title) title.textContent = nick;
+  var sub = document.getElementById('udSubtitle');
+  if (sub) sub.textContent = ((p.first_name || '') + ' ' + (p.last_name || '')).trim() || 'Scheda utente';
+  var err = document.getElementById('udError'), ok = document.getElementById('udSuccess');
+  if (err) err.classList.add('hidden'); if (ok) ok.classList.add('hidden');
+  var m = document.getElementById('userDetailModal');
+  if (m) { m.classList.remove('hidden'); m.classList.add('flex'); }
+}
+async function saveUserDetail(e) {
+  e.preventDefault();
+  if (!isAdmin || !supabaseClient) return;
+  var id = document.getElementById('udId').value;
+  var firstName = document.getElementById('udFirstName').value.trim();
+  var lastName = document.getElementById('udLastName').value.trim();
+  var nickname = document.getElementById('udNickname').value.trim();
+  var role = document.getElementById('udRole').value;
+  var status = document.getElementById('udStatus').value;
+  var notes = document.getElementById('udNotes').value.trim();
+  var displayName = nickname || (firstName + ' ' + lastName).trim();
+  var err = document.getElementById('udError'), ok = document.getElementById('udSuccess');
+  if (err) err.classList.add('hidden'); if (ok) ok.classList.add('hidden');
+  try {
+    var res = await supabaseClient.from('profiles').update({
+      first_name: firstName,
+      last_name: lastName,
+      nickname: nickname,
+      display_name: displayName,
+      role: role,
+      status: status,
+      notes: notes || null
+    }).eq('id', id).select('*');
+    if (res.error) {
+      if (err) { err.textContent = res.error.message; err.classList.remove('hidden'); }
+      return;
+    }
+    if (!res.data || !res.data.length) {
+      if (err) { err.textContent = 'Nessuna riga aggiornata (controlla policy RLS).'; err.classList.remove('hidden'); }
+      return;
+    }
+    if (ok) { ok.textContent = 'Scheda salvata.'; ok.classList.remove('hidden'); }
+    await loadUsersAdmin();
+    // refresh cache entry for modal title
+    var p = res.data[0];
+    var title = document.getElementById('udTitle');
+    if (title) title.textContent = p.nickname || p.display_name || 'Utente';
+    var av = document.getElementById('udAvatar');
+    if (av) av.textContent = String(p.nickname || p.display_name || '?').charAt(0).toUpperCase();
+  } catch (ex) {
+    if (err) { err.textContent = String(ex.message || ex); err.classList.remove('hidden'); }
+  }
+}
+async function quickApproveFromDetail(role) {
+  var id = document.getElementById('udId').value;
+  document.getElementById('udRole').value = role;
+  document.getElementById('udStatus').value = 'approved';
+  await saveUserDetail({ preventDefault: function(){} });
+}
+async function quickRejectFromDetail() {
+  if (!confirm('Rifiutare questa registrazione?')) return;
+  document.getElementById('udRole').value = 'pending';
+  document.getElementById('udStatus').value = 'rejected';
+  await saveUserDetail({ preventDefault: function(){} });
+}
+
 async function loadUsersAdmin() {
   if (!isAdmin || !supabaseClient) return;
   var pendingBox = document.getElementById('pendingUsersList');
@@ -244,9 +331,9 @@ async function loadUsersAdmin() {
     if (pendingBox) pendingBox.innerHTML = '<p class="text-red-400 text-xs">' + res.error.message + '</p>';
     return;
   }
-  var all = res.data || [];
-  var pending = all.filter(function(p) { return p.status === 'pending'; });
-  var active = all.filter(function(p) { return p.status === 'approved' || p.role === 'admin'; });
+  adminUsersCache = res.data || [];
+  var pending = adminUsersCache.filter(function(p) { return p.status === 'pending'; });
+  var active = adminUsersCache.filter(function(p) { return p.status === 'approved' || p.role === 'admin'; });
 
   function userCard(p, isPending) {
     var nick = p.nickname || p.display_name || '—';
@@ -258,21 +345,8 @@ async function loadUsersAdmin() {
                     p.role === 'yuma' ? 'bg-sky-500/20 text-sky-300 border-sky-500/40' :
                     p.role === 'socio' ? 'bg-emerald-500/20 text-emerald-300 border-emerald-500/40' :
                     'bg-slate-500/20 text-slate-300 border-slate-500/40';
-    var actions = '';
-    if (isPending) {
-      actions = '<div class="flex flex-wrap gap-1.5 mt-3">' +
-        '<button type="button" onclick="approveUser(\'' + p.id + '\',\'yuma\')" class="px-2.5 py-1 rounded-lg bg-sky-500/20 text-sky-300 border border-sky-500/30 text-[11px] font-semibold hover:bg-sky-500/30">Approva YUMA</button>' +
-        '<button type="button" onclick="approveUser(\'' + p.id + '\',\'socio\')" class="px-2.5 py-1 rounded-lg bg-emerald-500/20 text-emerald-300 border border-emerald-500/30 text-[11px] font-semibold hover:bg-emerald-500/30">Approva Socio</button>' +
-        '<button type="button" onclick="rejectUser(\'' + p.id + '\')" class="px-2.5 py-1 rounded-lg bg-red-500/15 text-red-300 border border-red-500/30 text-[11px] font-semibold hover:bg-red-500/25">Rifiuta</button>' +
-      '</div>';
-    } else if (p.role !== 'admin') {
-      actions = '<div class="flex items-center gap-2 mt-3">' +
-        '<select onchange="changeUserRole(\'' + p.id + '\', this.value)" class="bg-slate-800 border border-slate-600 rounded-lg text-[11px] text-slate-300 px-2 py-1">' +
-          '<option value="yuma"' + (p.role==='yuma'?' selected':'') + '>YUMA</option>' +
-          '<option value="socio"' + (p.role==='socio'?' selected':'') + '>Socio</option>' +
-        '</select></div>';
-    }
-    return '<div class="border border-slate-700/80 rounded-xl p-3.5 bg-slate-900/40 ' + (isPending ? 'border-amber-500/25 bg-amber-500/5' : '') + '">' +
+    return '<div class="border border-slate-700/80 rounded-xl p-3.5 bg-slate-900/40 cursor-pointer hover:border-sky-500/40 hover:bg-slate-800/50 transition ' +
+      (isPending ? 'border-amber-500/25 bg-amber-500/5' : '') + '" onclick="openUserDetail(\'' + p.id + '\')" title="Apri scheda utente">' +
       '<div class="flex gap-3">' +
         '<div class="w-11 h-11 rounded-full bg-gradient-to-br from-sky-500/30 to-blue-700/20 border border-sky-400/30 flex items-center justify-center font-orbitron font-bold text-sky-300 text-sm shrink-0">' + escapeHtml(initial) + '</div>' +
         '<div class="min-w-0 flex-1">' +
@@ -282,9 +356,11 @@ async function loadUsersAdmin() {
           '</div>' +
           '<div class="text-slate-300 text-xs mt-0.5">' + escapeHtml(fullName) + '</div>' +
           '<div class="text-sky-400/90 text-xs mt-0.5 truncate">' + escapeHtml(p.email || '') + '</div>' +
-          (p.notes ? '<div class="text-slate-400 text-[11px] mt-1.5 italic border-l-2 border-slate-600 pl-2">' + escapeHtml(p.notes) + '</div>' : '') +
-          (dateStr ? '<div class="text-slate-600 text-[10px] mt-1.5">' + dateStr + '</div>' : '') +
-          actions +
+          (p.notes ? '<div class="text-slate-400 text-[11px] mt-1.5 italic border-l-2 border-slate-600 pl-2 line-clamp-2">' + escapeHtml(p.notes) + '</div>' : '') +
+          '<div class="flex justify-between items-center mt-2">' +
+            (dateStr ? '<span class="text-slate-600 text-[10px]">' + dateStr + '</span>' : '<span></span>') +
+            '<span class="text-sky-400/70 text-[10px] font-semibold">Apri scheda →</span>' +
+          '</div>' +
         '</div>' +
       '</div>' +
     '</div>';
@@ -660,6 +736,8 @@ document.addEventListener('DOMContentLoaded', async function() {
   if (loginModal) loginModal.addEventListener('click', function(e) { if (e.target.id === 'loginModal') closeLoginModal(); });
   if (registerModal) registerModal.addEventListener('click', function(e) { if (e.target.id === 'registerModal') closeRegisterModal(); });
   if (adminModal) adminModal.addEventListener('click', function(e) { if (e.target.id === 'adminModal') closeAdminPanel(); });
+  var userDetailModal = document.getElementById('userDetailModal');
+  if (userDetailModal) userDetailModal.addEventListener('click', function(e) { if (e.target.id === 'userDetailModal') closeUserDetail(); });
   window.addEventListener('scroll', function() {
     var nav = document.getElementById('mainNav'); if (!nav) return;
     if (window.scrollY > 40) nav.classList.add('nav-scrolled'); else nav.classList.remove('nav-scrolled');

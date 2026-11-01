@@ -304,6 +304,77 @@
   <p class="text-slate-600 text-xs mt-3">25 Anni in Rotta Insieme</p>
 </footer>
 
+
+<!-- Scheda utente admin (modificabile) -->
+<div id="userDetailModal" class="fixed inset-0 bg-slate-950/90 backdrop-blur-md z-[60] hidden items-center justify-center p-4">
+  <div class="glass-card max-w-lg w-full p-6 md:p-7 rounded-2xl border border-sky-500/30 relative max-h-[92vh] overflow-y-auto">
+    <button type="button" onclick="closeUserDetail()" class="absolute top-4 right-4 text-slate-400 hover:text-white text-2xl leading-none z-10">&times;</button>
+    <div class="flex items-center gap-4 mb-6">
+      <div id="udAvatar" class="w-14 h-14 rounded-full bg-gradient-to-br from-sky-500/40 to-blue-700/30 border border-sky-400/40 flex items-center justify-center font-orbitron font-bold text-sky-200 text-xl shrink-0">?</div>
+      <div>
+        <h3 class="text-lg font-bold font-orbitron text-white" id="udTitle">Scheda utente</h3>
+        <p class="text-slate-400 text-xs mt-0.5" id="udSubtitle">Modifica i dati e salva</p>
+      </div>
+    </div>
+    <form id="userDetailForm" onsubmit="saveUserDetail(event)" class="space-y-3.5">
+      <input type="hidden" id="udId">
+      <div class="grid grid-cols-2 gap-3">
+        <div>
+          <label class="block text-[11px] font-semibold text-slate-400 uppercase tracking-wider mb-1.5">Nome</label>
+          <input type="text" id="udFirstName" class="auth-input" required>
+        </div>
+        <div>
+          <label class="block text-[11px] font-semibold text-slate-400 uppercase tracking-wider mb-1.5">Cognome</label>
+          <input type="text" id="udLastName" class="auth-input" required>
+        </div>
+      </div>
+      <div>
+        <label class="block text-[11px] font-semibold text-slate-400 uppercase tracking-wider mb-1.5">Nickname VSK</label>
+        <input type="text" id="udNickname" class="auth-input" required>
+      </div>
+      <div>
+        <label class="block text-[11px] font-semibold text-slate-400 uppercase tracking-wider mb-1.5">Email</label>
+        <input type="email" id="udEmail" class="auth-input bg-slate-900/50" readonly>
+        <p class="text-[10px] text-slate-500 mt-1">L'email non si modifica qui (è legata all'account)</p>
+      </div>
+      <div class="grid grid-cols-2 gap-3">
+        <div>
+          <label class="block text-[11px] font-semibold text-slate-400 uppercase tracking-wider mb-1.5">Ruolo</label>
+          <select id="udRole" class="auth-input">
+            <option value="yuma">YUMA</option>
+            <option value="socio">Socio</option>
+            <option value="admin">Admin</option>
+            <option value="pending">Pending</option>
+          </select>
+        </div>
+        <div>
+          <label class="block text-[11px] font-semibold text-slate-400 uppercase tracking-wider mb-1.5">Stato</label>
+          <select id="udStatus" class="auth-input">
+            <option value="pending">In attesa</option>
+            <option value="approved">Approvato</option>
+            <option value="rejected">Rifiutato</option>
+          </select>
+        </div>
+      </div>
+      <div>
+        <label class="block text-[11px] font-semibold text-slate-400 uppercase tracking-wider mb-1.5">Note</label>
+        <textarea id="udNotes" rows="3" class="auth-input resize-none" placeholder="Note interne, esperienza, contatti..."></textarea>
+      </div>
+      <div id="udError" class="hidden p-3 bg-red-500/15 border border-red-500/40 rounded-xl text-red-300 text-sm text-center"></div>
+      <div id="udSuccess" class="hidden p-3 bg-emerald-500/15 border border-emerald-500/40 rounded-xl text-emerald-300 text-sm text-center"></div>
+      <div class="flex flex-wrap gap-2 pt-1">
+        <button type="submit" class="btn-primary flex-1 min-w-[120px]">Salva scheda</button>
+        <button type="button" onclick="closeUserDetail()" class="btn-secondary">Chiudi</button>
+      </div>
+      <div class="flex flex-wrap gap-2 border-t border-slate-700/60 pt-3 mt-1" id="udQuickActions">
+        <button type="button" onclick="quickApproveFromDetail('yuma')" class="px-3 py-1.5 rounded-lg bg-sky-500/20 text-sky-300 border border-sky-500/30 text-xs font-semibold">Approva YUMA</button>
+        <button type="button" onclick="quickApproveFromDetail('socio')" class="px-3 py-1.5 rounded-lg bg-emerald-500/20 text-emerald-300 border border-emerald-500/30 text-xs font-semibold">Approva Socio</button>
+        <button type="button" onclick="quickRejectFromDetail()" class="px-3 py-1.5 rounded-lg bg-red-500/15 text-red-300 border border-red-500/30 text-xs font-semibold">Rifiuta</button>
+      </div>
+    </form>
+  </div>
+</div>
+
 <script src="i18n.js"></script>
 <script src="app.js"></script>
 </body>
