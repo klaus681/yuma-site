@@ -86,7 +86,7 @@ function updateAuthUI() {
   var loggedOut = document.getElementById('authLoggedOut'), loggedIn = document.getElementById('authLoggedIn');
   var mobOut = document.getElementById('mobileAuthOut'), mobIn = document.getElementById('mobileAuthIn');
   if (!loggedOut || !loggedIn) return;
-  var isApprovedMember = !!(currentUser && userProfile && (userProfile.status === 'approved' || userProfile.role === 'admin' || isAdmin));
+  var isApprovedMember = !!(currentUser && (isAdmin || (userProfile && userProfile.role === 'yuma' && (userProfile.status === 'approved' || !userProfile.status))));
   if (currentUser) {
     loggedOut.classList.add('hidden'); loggedOut.classList.remove('flex');
     loggedIn.classList.remove('hidden'); loggedIn.classList.add('flex');
@@ -97,7 +97,7 @@ function updateAuthUI() {
     document.querySelectorAll('[onclick*="openAdminPanel"]').forEach(function(b) {
       b.style.display = isAdmin ? '' : 'none';
     });
-    // Area Membri links
+    // YUMA Only links
     document.querySelectorAll('.nav-area-membri').forEach(function(el) {
       el.classList.toggle('hidden', !isApprovedMember);
     });

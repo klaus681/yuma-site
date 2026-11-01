@@ -61,7 +61,7 @@
       <a href="#trofei" class="hover:text-sky-400 transition" data-i18n="nav_trofei">Trofei</a>
       <a href="#roster" class="hover:text-sky-400 transition" data-i18n="nav_roster">Equipaggio</a>
       <a href="#unisciti" class="hover:text-amber-400 transition" data-i18n="nav_unisciti">Unisciti</a>
-      <a href="#area-membri" class="nav-area-membri hidden hover:text-emerald-400 transition text-emerald-400/90">Area Membri</a>
+      <a href="#area-membri" class="nav-area-membri hidden hover:text-emerald-400 transition text-emerald-400/90">YUMA Only</a>
     </div>
     <div class="flex items-center gap-2.5">
             <div id="authLoggedOut" class="flex items-center gap-2">
@@ -73,7 +73,7 @@
           <svg class="w-3.5 h-3.5 shrink-0" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M10 9a3 3 0 100-6 3 3 0 000 6zm-7 9a7 7 0 1114 0H3z" clip-rule="evenodd"/></svg>
           <span id="userEmailLabel">Utente</span>
         </span>
-        <a href="#area-membri" class="nav-area-membri hidden text-xs px-3 py-1.5 rounded-lg border border-emerald-500/40 text-emerald-300 hover:bg-emerald-500/15 font-semibold transition">Area Membri</a>
+        <a href="#area-membri" class="nav-area-membri hidden text-xs px-3 py-1.5 rounded-lg border border-emerald-500/40 text-emerald-300 hover:bg-emerald-500/15 font-semibold transition">YUMA Only</a>
         <button type="button" onclick="openAdminPanel()" class="bg-amber-500/90 hover:bg-amber-400 text-slate-950 font-black px-3 py-1.5 rounded-lg transition text-[11px] font-orbitron cursor-pointer shadow-lg shadow-amber-500/15" title="Pannello Admin">⚙️ Admin</button>
         <button type="button" onclick="logout()" class="text-slate-400 hover:text-red-400 text-xs font-semibold px-2 py-1.5 transition" title="Esci">Esci</button>
       </div>
@@ -90,14 +90,14 @@
       <a href="#trofei" onclick="toggleMenu()" class="px-3 py-2 rounded-lg hover:bg-slate-800/60 hover:text-sky-400">Trofei</a>
       <a href="#roster" onclick="toggleMenu()" class="px-3 py-2 rounded-lg hover:bg-slate-800/60 hover:text-sky-400">Equipaggio</a>
       <a href="#unisciti" onclick="toggleMenu()" class="px-3 py-2 rounded-lg hover:bg-slate-800/60 hover:text-amber-400">Unisciti a Noi</a>
-      <a href="#area-membri" onclick="toggleMenu()" class="nav-area-membri hidden px-3 py-2 rounded-lg hover:bg-slate-800/60 text-emerald-400">Area Membri</a>
+      <a href="#area-membri" onclick="toggleMenu()" class="nav-area-membri hidden px-3 py-2 rounded-lg hover:bg-slate-800/60 text-emerald-400">YUMA Only</a>
       <div class="border-t border-slate-800 my-2"></div>
       <div id="mobileAuthOut">
         <button type="button" onclick="toggleMenu(); openLoginModal()" class="w-full text-left px-3 py-2 rounded-lg hover:bg-slate-800/60 text-sky-400" data-i18n="nav_login">Accedi</button>
         <button type="button" onclick="toggleMenu(); openRegisterModal()" class="w-full text-left px-3 py-2 rounded-lg hover:bg-slate-800/60 text-amber-400" data-i18n="nav_register">Registrati</button>
       </div>
       <div id="mobileAuthIn" class="hidden">
-        <a href="#area-membri" onclick="toggleMenu()" class="nav-area-membri hidden block w-full text-left px-3 py-2 rounded-lg hover:bg-slate-800/60 text-emerald-400">Area Membri</a>
+        <a href="#area-membri" onclick="toggleMenu()" class="nav-area-membri hidden block w-full text-left px-3 py-2 rounded-lg hover:bg-slate-800/60 text-emerald-400">YUMA Only</a>
         <button type="button" onclick="toggleMenu(); openAdminPanel()" class="w-full text-left px-3 py-2 rounded-lg hover:bg-slate-800/60 text-amber-400">⚙️ Pannello Admin</button>
         <button type="button" onclick="toggleMenu(); logout()" class="w-full text-left px-3 py-2 rounded-lg hover:bg-slate-800/60 text-red-400" data-i18n="nav_logout">Esci</button>
       </div>
@@ -289,8 +289,8 @@
 <section id="area-membri" class="hidden py-20 md:py-28 px-5 max-w-4xl mx-auto">
   <div class="section-divider mb-16 md:mb-20"></div>
   <div class="text-center mb-10">
-    <span class="text-emerald-400 font-orbitron uppercase tracking-[0.2em] text-xs font-semibold" data-i18n="area_label">Solo per membri</span>
-    <h2 class="text-3xl md:text-5xl font-black mt-2 font-orbitron tracking-tight" data-i18n="area_title">Area Membri</h2>
+    <span class="text-emerald-400 font-orbitron uppercase tracking-[0.2em] text-xs font-semibold" data-i18n="area_label">Solo YUMA</span>
+    <h2 class="text-3xl md:text-5xl font-black mt-2 font-orbitron tracking-tight" data-i18n="area_title">YUMA Only</h2>
     <p class="text-slate-400 mt-2 text-sm md:text-base"><span data-i18n="area_desc">Il tuo spazio a bordo della community YUMA.</span></p>
   </div>
   <div id="areaMembriContent" class="glass-card p-6 md:p-10 rounded-3xl border border-emerald-500/25">
