@@ -50,37 +50,34 @@
 <body class="relative wave-bg">
 
 <nav id="mainNav" class="fixed top-0 left-0 w-full z-40 glass-card border-b border-sky-500/10 px-5 py-3.5 transition-all duration-300">
-  <div class="max-w-7xl mx-auto flex items-center justify-between">
-    <div class="flex items-center gap-3">
+  <div class="max-w-7xl mx-auto flex items-center justify-between gap-3">
+    <div class="flex items-center gap-3 shrink-0">
       <a href="#home" class="text-2xl md:text-3xl font-black tracking-widest text-sky-400 font-orbitron" id="nav-logo">YUMA</a>
       <span class="jubilee-badge text-amber-400 text-[10px] md:text-xs font-semibold px-2.5 py-0.5 rounded-full uppercase tracking-wider hidden sm:inline-block">25th Jubilee</span>
     </div>
-    <div class="hidden md:flex items-center gap-7 font-semibold tracking-wide text-slate-300 text-sm">
+    <div class="hidden md:flex items-center gap-6 font-semibold tracking-wide text-slate-300 text-sm">
       <a href="#home" class="hover:text-sky-400 transition" data-i18n="nav_home">Home</a>
       <a href="#storia" class="hover:text-sky-400 transition" data-i18n="nav_storia">La Storia</a>
       <a href="#trofei" class="hover:text-sky-400 transition" data-i18n="nav_trofei">Trofei</a>
       <a href="#roster" class="hover:text-sky-400 transition" data-i18n="nav_roster">Equipaggio</a>
       <a href="#unisciti" class="hover:text-amber-400 transition" data-i18n="nav_unisciti">Unisciti</a>
-      <a href="#area-soci" class="nav-area-soci hidden hover:text-emerald-400 transition text-emerald-400/90" data-i18n="nav_area_soci">Area Soci</a>
-      <a href="#area-yuma" class="nav-area-yuma hidden hover:text-sky-400 transition text-sky-400/90" data-i18n="nav_area_yuma">YUMA Only</a>
-      <a href="#area-yuma" class="nav-area-yuma hidden hover:text-emerald-400 transition text-emerald-400/90">YUMA Only</a>
     </div>
-    <div class="flex items-center gap-2.5">
-            <div id="authLoggedOut" class="flex items-center gap-2">
+    <div class="flex items-center gap-2 shrink-0">
+      <div id="authLoggedOut" class="flex items-center gap-2">
         <button type="button" onclick="openLoginModal()" class="btn-secondary text-xs px-3 py-1.5" data-i18n="nav_login">Accedi</button>
         <button type="button" onclick="openRegisterModal()" class="text-xs px-3 py-1.5 text-amber-400 hover:text-amber-300 font-semibold transition" data-i18n="nav_register">Registrati</button>
       </div>
       <div id="authLoggedIn" class="hidden items-center gap-2">
-        <span class="user-chip hidden sm:inline-flex" id="userChip">
+        <span class="user-chip hidden lg:inline-flex" id="userChip">
           <svg class="w-3.5 h-3.5 shrink-0" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M10 9a3 3 0 100-6 3 3 0 000 6zm-7 9a7 7 0 1114 0H3z" clip-rule="evenodd"/></svg>
           <span id="userEmailLabel">Utente</span>
         </span>
-        <a href="#area-yuma" class="nav-area-soci hidden text-xs px-3 py-1.5 rounded-lg border border-emerald-500/40 text-emerald-300 hover:bg-emerald-500/15 font-semibold transition" data-i18n="nav_area_soci">Area Soci</a>
-        <a href="#area-yuma" class="nav-area-yuma hidden text-xs px-3 py-1.5 rounded-lg border border-sky-500/40 text-sky-300 hover:bg-sky-500/15 font-semibold transition" data-i18n="nav_area_yuma">YUMA Only</a>
-        <button type="button" onclick="openAdminPanel()" class="bg-amber-500/90 hover:bg-amber-400 text-slate-950 font-black px-3 py-1.5 rounded-lg transition text-[11px] font-orbitron cursor-pointer shadow-lg shadow-amber-500/15" title="Pannello Admin">⚙️ Admin</button>
-        <button type="button" onclick="logout()" class="text-slate-400 hover:text-red-400 text-xs font-semibold px-2 py-1.5 transition" title="Esci">Esci</button>
+        <a href="#area-soci" class="nav-area-soci hidden text-xs px-2.5 py-1.5 rounded-lg border border-emerald-500/40 text-emerald-300 hover:bg-emerald-500/15 font-semibold transition whitespace-nowrap" data-i18n="nav_area_soci">Area Soci</a>
+        <a href="#area-yuma" class="nav-area-yuma hidden text-xs px-2.5 py-1.5 rounded-lg border border-sky-500/40 text-sky-300 hover:bg-sky-500/15 font-semibold transition whitespace-nowrap" data-i18n="nav_area_yuma">YUMA Only</a>
+        <button type="button" onclick="openAdminPanel()" class="bg-amber-500/90 hover:bg-amber-400 text-slate-950 font-black px-3 py-1.5 rounded-lg transition text-[11px] font-orbitron cursor-pointer shadow-lg shadow-amber-500/15" title="Pannello Admin">Admin</button>
+        <button type="button" onclick="logout()" class="text-slate-400 hover:text-red-400 text-xs font-semibold px-2 py-1.5 transition" data-i18n="nav_logout" title="Esci">Esci</button>
       </div>
-      <a href="#unisciti" class="hidden sm:inline-flex bg-gradient-to-r from-sky-500 to-blue-600 hover:from-sky-400 hover:to-blue-500 text-white font-bold px-4 py-1.5 rounded-lg transition shadow-lg shadow-sky-500/20 font-orbitron text-xs">Candidati</a>
+      <a href="#unisciti" class="hidden xl:inline-flex bg-gradient-to-r from-sky-500 to-blue-600 hover:from-sky-400 hover:to-blue-500 text-white font-bold px-4 py-1.5 rounded-lg transition shadow-lg shadow-sky-500/20 font-orbitron text-xs" data-i18n="nav_candidati">Candidati</a>
       <button type="button" id="menuBtn" onclick="toggleMenu()" class="md:hidden text-slate-300 hover:text-white p-1.5" aria-label="Menu">
         <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"/></svg>
       </button>
@@ -88,22 +85,20 @@
   </div>
   <div id="mobileMenu" class="md:hidden mt-3 border-t border-slate-800/80">
     <div class="flex flex-col gap-1 py-3 text-sm font-semibold text-slate-300">
-      <a href="#home" onclick="toggleMenu()" class="px-3 py-2 rounded-lg hover:bg-slate-800/60 hover:text-sky-400">Home</a>
-      <a href="#storia" onclick="toggleMenu()" class="px-3 py-2 rounded-lg hover:bg-slate-800/60 hover:text-sky-400">La Storia</a>
-      <a href="#trofei" onclick="toggleMenu()" class="px-3 py-2 rounded-lg hover:bg-slate-800/60 hover:text-sky-400">Trofei</a>
-      <a href="#roster" onclick="toggleMenu()" class="px-3 py-2 rounded-lg hover:bg-slate-800/60 hover:text-sky-400">Equipaggio</a>
-      <a href="#unisciti" onclick="toggleMenu()" class="px-3 py-2 rounded-lg hover:bg-slate-800/60 hover:text-amber-400" data-i18n="nav_unisciti">Unisciti a Noi</a>
+      <a href="#home" onclick="toggleMenu()" class="px-3 py-2 rounded-lg hover:bg-slate-800/60 hover:text-sky-400" data-i18n="nav_home">Home</a>
+      <a href="#storia" onclick="toggleMenu()" class="px-3 py-2 rounded-lg hover:bg-slate-800/60 hover:text-sky-400" data-i18n="nav_storia">La Storia</a>
+      <a href="#trofei" onclick="toggleMenu()" class="px-3 py-2 rounded-lg hover:bg-slate-800/60 hover:text-sky-400" data-i18n="nav_trofei">Trofei</a>
+      <a href="#roster" onclick="toggleMenu()" class="px-3 py-2 rounded-lg hover:bg-slate-800/60 hover:text-sky-400" data-i18n="nav_roster">Equipaggio</a>
+      <a href="#unisciti" onclick="toggleMenu()" class="px-3 py-2 rounded-lg hover:bg-slate-800/60 hover:text-amber-400" data-i18n="nav_unisciti">Unisciti</a>
       <a href="#area-soci" onclick="toggleMenu()" class="nav-area-soci hidden px-3 py-2 rounded-lg hover:bg-slate-800/60 text-emerald-400" data-i18n="nav_area_soci">Area Soci</a>
       <a href="#area-yuma" onclick="toggleMenu()" class="nav-area-yuma hidden px-3 py-2 rounded-lg hover:bg-slate-800/60 text-sky-400" data-i18n="nav_area_yuma">YUMA Only</a>
-      <a href="#area-yuma" onclick="toggleMenu()" class="nav-area-yuma hidden px-3 py-2 rounded-lg hover:bg-slate-800/60 text-emerald-400">YUMA Only</a>
       <div class="border-t border-slate-800 my-2"></div>
       <div id="mobileAuthOut">
         <button type="button" onclick="toggleMenu(); openLoginModal()" class="w-full text-left px-3 py-2 rounded-lg hover:bg-slate-800/60 text-sky-400" data-i18n="nav_login">Accedi</button>
         <button type="button" onclick="toggleMenu(); openRegisterModal()" class="w-full text-left px-3 py-2 rounded-lg hover:bg-slate-800/60 text-amber-400" data-i18n="nav_register">Registrati</button>
       </div>
       <div id="mobileAuthIn" class="hidden">
-        <a href="#area-yuma" onclick="toggleMenu()" class="nav-area-yuma hidden block w-full text-left px-3 py-2 rounded-lg hover:bg-slate-800/60 text-emerald-400">YUMA Only</a>
-        <button type="button" onclick="toggleMenu(); openAdminPanel()" class="w-full text-left px-3 py-2 rounded-lg hover:bg-slate-800/60 text-amber-400">⚙️ Pannello Admin</button>
+        <button type="button" onclick="toggleMenu(); openAdminPanel()" class="w-full text-left px-3 py-2 rounded-lg hover:bg-slate-800/60 text-amber-400">Admin</button>
         <button type="button" onclick="toggleMenu(); logout()" class="w-full text-left px-3 py-2 rounded-lg hover:bg-slate-800/60 text-red-400" data-i18n="nav_logout">Esci</button>
       </div>
     </div>
