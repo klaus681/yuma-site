@@ -223,7 +223,7 @@
 </div>
 
 <div id="adminModal" class="fixed inset-0 bg-slate-950/90 backdrop-blur-md z-50 hidden items-center justify-center p-4">
-  <div class="glass-card max-w-lg w-full p-6 rounded-2xl border border-sky-500/35 relative max-h-[92vh] overflow-y-auto">
+  <div class="glass-card max-w-xl w-full p-6 rounded-2xl border border-sky-500/35 relative max-h-[92vh] overflow-y-auto">
     <div class="flex justify-between items-center mb-4 border-b border-slate-800 pb-3">
       <div>
         <h3 class="text-lg font-bold font-orbitron text-sky-400">⚙️ Pannello Admin YUMA</h3>
@@ -236,6 +236,8 @@
       <button type="button" onclick="showAdminTab('roster')" id="tab-roster" class="admin-tab px-3 py-1.5 rounded-lg bg-slate-800/60 text-slate-400 border border-slate-700">Equipaggio</button>
       <button type="button" onclick="showAdminTab('users')" id="tab-users" class="admin-tab px-3 py-1.5 rounded-lg bg-slate-800/60 text-slate-400 border border-slate-700">Utenti</button>
       <button type="button" onclick="showAdminTab('system')" id="tab-system" class="admin-tab px-3 py-1.5 rounded-lg bg-slate-800/60 text-slate-400 border border-slate-700">Sistema</button>
+      <button type="button" onclick="showAdminTab('downloads')" id="tab-downloads" class="admin-tab px-3 py-1.5 rounded-lg bg-slate-800/60 text-slate-400 border border-slate-700">Download</button>
+      <button type="button" onclick="showAdminTab('board')" id="tab-board" class="admin-tab px-3 py-1.5 rounded-lg bg-slate-800/60 text-slate-400 border border-slate-700">Bacheca</button>
     </div>
     <div id="adminTab-content" class="space-y-4 text-left">
       <div class="bg-sky-500/10 border border-sky-500/25 p-3 rounded-lg text-sky-300 text-xs">Modifica i testi. Poi <strong>Salva</strong>.</div>
@@ -278,7 +280,28 @@
       </div>
       <button type="button" onclick="logout(); closeAdminPanel();" class="w-full text-left px-4 py-2.5 rounded-xl border border-red-500/30 text-red-300 hover:bg-red-500/10 text-sm font-semibold transition">Esci</button>
     </div>
-    <div class="flex justify-between items-center border-t border-slate-800 pt-4 mt-5">
+<div id="adminTab-downloads" class="hidden space-y-4 text-left">
+      <div class="bg-sky-500/10 border border-sky-500/25 p-3 rounded-lg text-sky-300 text-xs">Gestisci i file scaricabili nell'area <strong>YUMA Only</strong>. Incolla un link (Google Drive, Dropbox, URL diretto…).</div>
+      <div class="grid gap-2">
+        <input type="text" id="dlTitle" class="auth-input text-sm" placeholder="Titolo file">
+        <input type="text" id="dlUrl" class="auth-input text-sm" placeholder="URL download">
+        <input type="text" id="dlDesc" class="auth-input text-sm" placeholder="Descrizione (opzionale)">
+        <button type="button" onclick="addYumaDownload()" class="btn-primary text-sm">Aggiungi download</button>
+      </div>
+      <div id="adminDownloadsList" class="space-y-2 text-xs"><p class="text-slate-500">Caricamento...</p></div>
+    </div>
+    <div id="adminTab-board" class="hidden space-y-4 text-left">
+      <div class="bg-amber-500/10 border border-amber-500/25 p-3 rounded-lg text-amber-300 text-xs">Messaggi sulla <strong>bacheca YUMA</strong> (lavagna nell'area riservata).</div>
+      <div class="grid gap-2">
+        <input type="text" id="boardTitle" class="auth-input text-sm" placeholder="Titolo (opzionale)">
+        <textarea id="boardBody" rows="3" class="auth-input text-sm resize-none" placeholder="Testo del messaggio..."></textarea>
+        <label class="flex items-center gap-2 text-xs text-slate-400"><input type="checkbox" id="boardPinned" class="rounded"> Fissa in alto</label>
+        <button type="button" onclick="addYumaBoardPost()" class="btn-primary text-sm">Pubblica in bacheca</button>
+      </div>
+      <div id="adminBoardList" class="space-y-2 text-xs"><p class="text-slate-500">Caricamento...</p></div>
+    </div>
+
+        <div class="flex justify-between items-center border-t border-slate-800 pt-4 mt-5">
       <button type="button" onclick="saveChanges()" class="btn-primary text-sm px-5 py-2">Salva Testi</button>
       <button type="button" onclick="closeAdminPanel()" class="text-slate-400 hover:text-white text-xs cursor-pointer">Chiudi</button>
     </div>
@@ -318,7 +341,8 @@
 </footer>
 
 
-<!-- Scheda utente admin (modificabile) -->
+
+    <!-- Scheda utente admin (modificabile) -->
 <div id="userDetailModal" class="fixed inset-0 bg-slate-950/90 backdrop-blur-md z-[60] hidden items-center justify-center p-4">
   <div class="glass-card max-w-lg w-full p-6 md:p-7 rounded-2xl border border-sky-500/30 relative max-h-[92vh] overflow-y-auto">
     <button type="button" onclick="closeUserDetail()" class="absolute top-4 right-4 text-slate-400 hover:text-white text-2xl leading-none z-10">&times;</button>

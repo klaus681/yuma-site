@@ -40,7 +40,7 @@ function closeAdminPanel() {
 }
 function toggleMenu() { var menu = document.getElementById('mobileMenu'); if (menu) menu.classList.toggle('open'); }
 function showAdminTab(name) {
-  ['content','roster','users','system'].forEach(function(t) {
+  ['content','roster','users','system','downloads','board'].forEach(function(t) {
     var tab = document.getElementById('adminTab-' + t), btn = document.getElementById('tab-' + t);
     if (tab) tab.classList.toggle('hidden', t !== name);
     if (btn) btn.className = t === name
@@ -50,6 +50,8 @@ function showAdminTab(name) {
   if (name === 'roster') renderAdminMembers();
   if (name === 'users') loadUsersAdmin();
   if (name === 'system') loadCandidatureList();
+  if (name === 'downloads') loadAdminDownloads();
+  if (name === 'board') loadAdminBoard();
 }
 
 async function initAuth() {
@@ -712,69 +714,155 @@ function renderAreaSoci() {
 }
 
 function renderAreaYuma() {
-  var _t = typeof t === 'function' ? t : function(k, v) {
-    var s = k;
-    if (v && v.name) s = 'Benvenuto a bordo, ' + v.name + '!';
-    return s;
-  };
-  var box = document.getElementById('areaYumaContent');
+  var box = document.getElementById('areaYumaContent') || document.getElementById('areaMembriContent');
   if (!box) return;
-  var name = (userProfile && userProfile.display_name) || (currentUser && currentUser.email) || 'Membro';
-  var role = (userProfile && userProfile.role) || 'membro';
-  var roleLabel = role === 'admin' ? 'Admin' : (role === 'yuma' ? 'YUMA' : (role === 'socio' ? 'Socio' : role));
-  var roleColor = role === 'admin' ? 'text-amber-400 border-amber-500/40 bg-amber-500/10' :
-                  role === 'yuma' ? 'text-sky-400 border-sky-500/40 bg-sky-500/10' :
-                  'text-emerald-400 border-emerald-500/40 bg-emerald-500/10';
+  var name = (userProfile && (userProfile.nickname || userProfile.display_name)) || (currentUser && currentUser.email) || 'YUMA';
+  box.innerHTML =
+    '<div class="text-center mb-8">' +
+      '<div class="inline-flex items-center gap-2 px-4 py-1.5 rounded-full border text-sm font-semibold mb-4 text-sky-400 border-sky-500/40 bg-sky-500/10">' +
+        '<span class="w-2 h-2 rounded-full bg-current"></span> YUMA Only' +
+      '</div>' +
+      '<h3 class="text-2xl md:text-3xl font-black font-orbitron text-white">Benvenuto a bordo, ' + escapeHtml(name) + '</h3>' +
+      '<p class="text-slate-400 mt-2 text-sm">Area riservata al team YUMA.</p>' +
+    '</div>' +
+    '<div class="grid lg:grid-cols-2 gap-5">' +
+      '<div class="glass-card p-5 rounded-2xl border border-sky-500/25">' +
+        '<h4 class="text-sm font-bold font-orbitron text-sky-300 uppercase tracking-wider mb-3">Download</h4>' +
+        '<div id="yumaDownloadsBox"><p class="text-slate-500 text-xs">Caricamento...</p></div>' +
+      '</div>' +
+      '<div class="rounded-2xl border border-amber-500/30 p-5 relative overflow-hidden" style="background:linear-gradient(145deg,rgba(41,37,20,0.95),rgba(28,25,15,0.98));box-shadow:inset 0 0 40px rgba(0,0,0,0.35)">' +
+        '<div class="absolute inset-0 opacity-[0.07] pointer-events-none" style="background-image:repeating-linear-gradient(0deg,transparent,transparent 27px,rgba(255,255,255,0.15) 28px)"></div>' +
+        '<h4 class="text-sm font-bold font-orbitron text-amber-300/90 uppercase tracking-wider mb-3 relative">Bacheca</h4>' +
+        '<div id="yumaBoardBox" class="relative space-y-3 max-h-80 overflow-y-auto pr-1"><p class="text-amber-200/50 text-xs">Caricamento...</p></div>' +
+      '</div>' +
+    '</div>';
+  loadYumaDownloads();
+  loadYumaBoard();
+}
 
-  box.innerHTML = '<div class="text-center mb-8">' +
-    '<div class="inline-flex items-center gap-2 px-4 py-1.5 rounded-full border text-sm font-semibold mb-4 ' + roleColor + '">' +
-      '<span class="w-2 h-2 rounded-full bg-current"></span> ' + escapeHtml(roleLabel) +
-    '</div>' +
-    '<h3 class="text-2xl md:text-3xl font-black font-orbitron text-white">' + escapeHtml(_t('area_welcome', {name: name})) + '</h3>' +
-    '<p class="text-slate-400 mt-2 text-sm md:text-base">' + escapeHtml(_t('area_welcome_sub')) + '</p>' +
-  '</div>' +
-  '<div class="grid sm:grid-cols-2 gap-4 mb-8">' +
-    '<div class="glass-card p-5 rounded-2xl border border-sky-500/20">' +
-      '<div class="text-sky-400 text-xs font-semibold uppercase tracking-wider mb-1">' + escapeHtml(_t('area_role')) + '</div>' +
-      '<div class="text-xl font-bold font-orbitron text-white">' + escapeHtml(roleLabel) + '</div>' +
-      '<p class="text-slate-400 text-xs mt-2">' +
-        (role === 'yuma' ? _t('area_role_yuma') :
-         role === 'socio' ? _t('area_role_socio') :
-         _t('area_role_admin')) +
-      '</p>' +
-    '</div>' +
-    '<div class="glass-card p-5 rounded-2xl border border-amber-500/20">' +
-      '<div class="text-amber-400 text-xs font-semibold uppercase tracking-wider mb-1">' + escapeHtml(_t('area_next')) + '</div>' +
-      '<ul class="text-slate-300 text-sm space-y-1.5 mt-2">' +
-        '<li>' + escapeHtml(_t('area_next1')) + '</li>' +
-        '<li>' + escapeHtml(_t('area_next2')) + '</li>' +
-        '<li>' + escapeHtml(_t('area_next3')) + '</li>' +
-      '</ul>' +
-    '</div>' +
-  '</div>' +
-  '<div id="areaYumaList" class="glass-card p-5 rounded-2xl">' +
-    '<h4 class="text-sm font-semibold text-slate-300 uppercase tracking-wider mb-3">' + escapeHtml(_t('area_members')) + '</h4>' +
-    '<p class="text-slate-500 text-xs">Caricamento...</p>' +
-  '</div>';
+async function loadYumaDownloads() {
+  var box = document.getElementById('yumaDownloadsBox');
+  if (!box || !supabaseClient) return;
+  try {
+    var res = await supabaseClient.from('yuma_downloads').select('*').order('sort_order', { ascending: true }).order('created_at', { ascending: false });
+    if (res.error) { box.innerHTML = '<p class="text-red-400 text-xs">' + escapeHtml(res.error.message) + '</p>'; return; }
+    var list = res.data || [];
+    if (!list.length) { box.innerHTML = '<p class="text-slate-500 text-xs">Nessun file al momento.</p>'; return; }
+    box.innerHTML = '<div class="space-y-2">' + list.map(function(d) {
+      return '<a href="' + escapeHtml(d.file_url) + '" target="_blank" rel="noopener" class="block p-3 rounded-xl border border-slate-700/80 bg-slate-900/50 hover:border-sky-500/40 hover:bg-slate-800/60 transition">' +
+        '<div class="text-white text-sm font-semibold">' + escapeHtml(d.title) + '</div>' +
+        (d.description ? '<div class="text-slate-400 text-[11px] mt-0.5">' + escapeHtml(d.description) + '</div>' : '') +
+        '<div class="text-sky-400 text-[10px] mt-1.5 font-semibold">Scarica →</div></a>';
+    }).join('') + '</div>';
+  } catch (e) {
+    box.innerHTML = '<p class="text-red-400 text-xs">Errore caricamento</p>';
+  }
+}
 
-  loadApprovedMembers().then(function(list) {
-    var listBox = document.getElementById('areaYumaList');
-    if (!listBox) return;
-    if (!list.length) {
-      listBox.innerHTML = '<h4 class="text-sm font-semibold text-slate-300 uppercase tracking-wider mb-3">' + escapeHtml(_t('area_members')) + '</h4><p class="text-slate-500 text-xs">' + escapeHtml(_t('area_members_none')) + '</p>';
-      return;
-    }
-    listBox.innerHTML = '<h4 class="text-sm font-semibold text-slate-300 uppercase tracking-wider mb-3">' + escapeHtml(_t('area_members')) + ' (' + list.length + ')</h4>' +
-      '<div class="flex flex-wrap gap-2">' +
-      list.map(function(p) {
-        var r = p.role === 'admin' ? 'Admin' : (p.role === 'yuma' ? 'YUMA' : 'Socio');
-        var col = p.role === 'admin' ? 'border-amber-500/30 text-amber-300' : (p.role === 'yuma' ? 'border-sky-500/30 text-sky-300' : 'border-emerald-500/30 text-emerald-300');
-        return '<span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg border text-xs bg-slate-900/60 ' + col + '">' +
-          escapeHtml(p.display_name || p.email || '?') +
-          '<span class="opacity-60 text-[10px]">' + r + '</span></span>';
-      }).join('') +
+async function loadYumaBoard() {
+  var box = document.getElementById('yumaBoardBox');
+  if (!box || !supabaseClient) return;
+  try {
+    var res = await supabaseClient.from('yuma_board').select('*').order('pinned', { ascending: false }).order('created_at', { ascending: false });
+    if (res.error) { box.innerHTML = '<p class="text-red-300/80 text-xs">' + escapeHtml(res.error.message) + '</p>'; return; }
+    var list = res.data || [];
+    if (!list.length) { box.innerHTML = '<p class="text-amber-200/40 text-xs italic">La lavagna è vuota.</p>'; return; }
+    box.innerHTML = list.map(function(m) {
+      var dateStr = m.created_at ? new Date(m.created_at).toLocaleDateString('it-IT') : '';
+      return '<div class="pb-3 border-b border-amber-500/10 last:border-0">' +
+        (m.pinned ? '<span class="text-[10px] text-amber-400/80 font-semibold uppercase">Fissato · </span>' : '') +
+        (m.title ? '<div class="text-amber-100 font-semibold text-sm">' + escapeHtml(m.title) + '</div>' : '') +
+        '<div class="text-amber-50/85 text-sm leading-relaxed whitespace-pre-wrap mt-0.5">' + escapeHtml(m.body) + '</div>' +
+        (dateStr ? '<div class="text-amber-200/30 text-[10px] mt-1">' + dateStr + '</div>' : '') +
       '</div>';
+    }).join('');
+  } catch (e) {
+    box.innerHTML = '<p class="text-red-300/80 text-xs">Errore caricamento</p>';
+  }
+}
+
+async function loadAdminDownloads() {
+  var box = document.getElementById('adminDownloadsList');
+  if (!box || !supabaseClient) return;
+  box.innerHTML = '<p class="text-slate-500">Caricamento...</p>';
+  var res = await supabaseClient.from('yuma_downloads').select('*').order('sort_order').order('created_at', { ascending: false });
+  if (res.error) { box.innerHTML = '<p class="text-red-400">' + escapeHtml(res.error.message) + '</p>'; return; }
+  var list = res.data || [];
+  if (!list.length) { box.innerHTML = '<p class="text-slate-500">Nessun download.</p>'; return; }
+  box.innerHTML = list.map(function(d) {
+    return '<div class="border border-slate-700 rounded-lg p-2.5 flex justify-between gap-2 items-start">' +
+      '<div class="min-w-0"><div class="text-white font-semibold truncate">' + escapeHtml(d.title) + '</div>' +
+      '<div class="text-slate-500 truncate text-[10px]">' + escapeHtml(d.file_url) + '</div></div>' +
+      '<button type="button" onclick="deleteYumaDownload(' + d.id + ')" class="text-red-400 text-[11px] shrink-0 hover:underline">Elimina</button></div>';
+  }).join('');
+}
+
+async function addYumaDownload() {
+  if (!isAdmin || !supabaseClient) return;
+  var title = (document.getElementById('dlTitle') || {}).value || '';
+  var url = (document.getElementById('dlUrl') || {}).value || '';
+  var desc = (document.getElementById('dlDesc') || {}).value || '';
+  title = title.trim(); url = url.trim(); desc = desc.trim();
+  if (!title || !url) { alert('Titolo e URL obbligatori.'); return; }
+  var res = await supabaseClient.from('yuma_downloads').insert({
+    title: title, file_url: url, description: desc,
+    created_by: currentUser && currentUser.id
   });
+  if (res.error) { alert(res.error.message); return; }
+  document.getElementById('dlTitle').value = '';
+  document.getElementById('dlUrl').value = '';
+  document.getElementById('dlDesc').value = '';
+  loadAdminDownloads();
+}
+
+async function deleteYumaDownload(id) {
+  if (!isAdmin || !supabaseClient) return;
+  if (!confirm('Eliminare questo download?')) return;
+  var res = await supabaseClient.from('yuma_downloads').delete().eq('id', id);
+  if (res.error) { alert(res.error.message); return; }
+  loadAdminDownloads();
+}
+
+async function loadAdminBoard() {
+  var box = document.getElementById('adminBoardList');
+  if (!box || !supabaseClient) return;
+  box.innerHTML = '<p class="text-slate-500">Caricamento...</p>';
+  var res = await supabaseClient.from('yuma_board').select('*').order('pinned', { ascending: false }).order('created_at', { ascending: false });
+  if (res.error) { box.innerHTML = '<p class="text-red-400">' + escapeHtml(res.error.message) + '</p>'; return; }
+  var list = res.data || [];
+  if (!list.length) { box.innerHTML = '<p class="text-slate-500">Nessun messaggio.</p>'; return; }
+  box.innerHTML = list.map(function(m) {
+    return '<div class="border border-slate-700 rounded-lg p-2.5">' +
+      '<div class="flex justify-between gap-2"><div class="text-white font-semibold">' + escapeHtml(m.title || '(senza titolo)') +
+      (m.pinned ? ' <span class="text-amber-400 text-[10px]">PIN</span>' : '') + '</div>' +
+      '<button type="button" onclick="deleteYumaBoardPost(' + m.id + ')" class="text-red-400 text-[11px] hover:underline">Elimina</button></div>' +
+      '<div class="text-slate-400 mt-1 whitespace-pre-wrap">' + escapeHtml(m.body) + '</div></div>';
+  }).join('');
+}
+
+async function addYumaBoardPost() {
+  if (!isAdmin || !supabaseClient) return;
+  var title = ((document.getElementById('boardTitle') || {}).value || '').trim();
+  var body = ((document.getElementById('boardBody') || {}).value || '').trim();
+  var pinned = !!(document.getElementById('boardPinned') || {}).checked;
+  if (!body) { alert('Scrivi un messaggio.'); return; }
+  var res = await supabaseClient.from('yuma_board').insert({
+    title: title, body: body, pinned: pinned,
+    created_by: currentUser && currentUser.id
+  });
+  if (res.error) { alert(res.error.message); return; }
+  document.getElementById('boardTitle').value = '';
+  document.getElementById('boardBody').value = '';
+  document.getElementById('boardPinned').checked = false;
+  loadAdminBoard();
+}
+
+async function deleteYumaBoardPost(id) {
+  if (!isAdmin || !supabaseClient) return;
+  if (!confirm('Eliminare questo messaggio?')) return;
+  var res = await supabaseClient.from('yuma_board').delete().eq('id', id);
+  if (res.error) { alert(res.error.message); return; }
+  loadAdminBoard();
 }
 
 
