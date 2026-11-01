@@ -40,7 +40,7 @@ function closeAdminPanel() {
 }
 function toggleMenu() { var menu = document.getElementById('mobileMenu'); if (menu) menu.classList.toggle('open'); }
 function showAdminTab(name) {
-  ['content','roster','users','system','downloads','board'].forEach(function(t) {
+  ['content','roster','users','system','downloads','board','socio_dl','socio_board'].forEach(function(t) {
     var tab = document.getElementById('adminTab-' + t), btn = document.getElementById('tab-' + t);
     if (tab) tab.classList.toggle('hidden', t !== name);
     if (btn) btn.className = t === name
@@ -52,6 +52,8 @@ function showAdminTab(name) {
   if (name === 'system') loadCandidatureList();
   if (name === 'downloads') loadAdminDownloads();
   if (name === 'board') loadAdminBoard();
+  if (name === 'socio_dl') loadAdminSocioDownloads();
+  if (name === 'socio_board') loadAdminSocioBoard();
 }
 
 async function initAuth() {
@@ -678,39 +680,74 @@ async function loadApprovedMembers() {
 
 
 function renderAreaSoci() {
-  var _t = typeof t === 'function' ? t : function(k, v) {
-    if (k === 'area_welcome' && v && v.name) return 'Benvenuto, ' + v.name + '!';
-    return k;
-  };
   var box = document.getElementById('areaSociContent');
   if (!box) return;
   var name = (userProfile && (userProfile.nickname || userProfile.display_name)) || (currentUser && currentUser.email) || 'Socio';
   var fullName = ((userProfile && userProfile.first_name) || '') + ' ' + ((userProfile && userProfile.last_name) || '');
   fullName = fullName.trim();
+  box.innerHTML =
+    '<div class="text-center mb-8">' +
+      '<div class="inline-flex items-center gap-2 px-4 py-1.5 rounded-full border text-sm font-semibold mb-4 text-emerald-400 border-emerald-500/40 bg-emerald-500/10">' +
+        '<span class="w-2 h-2 rounded-full bg-current"></span> Socio' +
+      '</div>' +
+      '<h3 class="text-2xl md:text-3xl font-black font-orbitron text-white">Benvenuto, ' + escapeHtml(name) + '</h3>' +
+      (fullName ? '<p class="text-slate-400 mt-1 text-sm">' + escapeHtml(fullName) + '</p>' : '') +
+      '<p class="text-slate-400 mt-2 text-sm">Area riservata ai Soci della community YUMA.</p>' +
+    '</div>' +
+    '<div class="grid lg:grid-cols-2 gap-5">' +
+      '<div class="glass-card p-5 rounded-2xl border border-emerald-500/25">' +
+        '<h4 class="text-sm font-bold font-orbitron text-emerald-300 uppercase tracking-wider mb-3">Download</h4>' +
+        '<div id="socioDownloadsBox"><p class="text-slate-500 text-xs">Caricamento...</p></div>' +
+      '</div>' +
+      '<div class="rounded-2xl border border-emerald-500/30 p-5 relative overflow-hidden" style="background:linear-gradient(145deg,rgba(20,40,30,0.95),rgba(15,28,22,0.98));box-shadow:inset 0 0 40px rgba(0,0,0,0.35)">' +
+        '<div class="absolute inset-0 opacity-[0.07] pointer-events-none" style="background-image:repeating-linear-gradient(0deg,transparent,transparent 27px,rgba(255,255,255,0.12) 28px)"></div>' +
+        '<h4 class="text-sm font-bold font-orbitron text-emerald-300/90 uppercase tracking-wider mb-3 relative">Bacheca</h4>' +
+        '<div id="socioBoardBox" class="relative space-y-3 max-h-80 overflow-y-auto pr-1"><p class="text-emerald-200/50 text-xs">Caricamento...</p></div>' +
+      '</div>' +
+    '</div>';
+  loadSocioDownloads();
+  loadSocioBoard();
+}
 
-  box.innerHTML = '<div class="text-center mb-8">' +
-    '<div class="inline-flex items-center gap-2 px-4 py-1.5 rounded-full border text-sm font-semibold mb-4 text-emerald-400 border-emerald-500/40 bg-emerald-500/10">' +
-      '<span class="w-2 h-2 rounded-full bg-current"></span> Socio' +
-    '</div>' +
-    '<h3 class="text-2xl md:text-3xl font-black font-orbitron text-white">' + escapeHtml(_t('area_welcome', {name: name})) + '</h3>' +
-    (fullName ? '<p class="text-slate-400 mt-1 text-sm">' + escapeHtml(fullName) + '</p>' : '') +
-    '<p class="text-slate-400 mt-2 text-sm md:text-base">' + escapeHtml(_t('area_soci_welcome_sub') || 'Sei parte della community YUMA come Socio.') + '</p>' +
-  '</div>' +
-  '<div class="grid sm:grid-cols-2 gap-4">' +
-    '<div class="glass-card p-5 rounded-2xl border border-emerald-500/20">' +
-      '<div class="text-emerald-400 text-xs font-semibold uppercase tracking-wider mb-1">' + escapeHtml(_t('area_role') || 'Il tuo ruolo') + '</div>' +
-      '<div class="text-xl font-bold font-orbitron text-white">Socio</div>' +
-      '<p class="text-slate-400 text-xs mt-2">' + escapeHtml(_t('area_role_socio') || 'Socio della community – supporto e passione per la vela virtuale.') + '</p>' +
-    '</div>' +
-    '<div class="glass-card p-5 rounded-2xl border border-amber-500/20">' +
-      '<div class="text-amber-400 text-xs font-semibold uppercase tracking-wider mb-1">' + escapeHtml(_t('area_next') || 'Prossimi passi') + '</div>' +
-      '<ul class="text-slate-300 text-sm space-y-1.5 mt-2">' +
-        '<li>' + escapeHtml(_t('area_next1') || '• Unisciti al canale Discord del team') + '</li>' +
-        '<li>' + escapeHtml(_t('area_next2') || '• Partecipa alle regate e agli allenamenti') + '</li>' +
-        '<li>' + escapeHtml(_t('area_next3') || '• Contatta un admin per qualsiasi dubbio') + '</li>' +
-      '</ul>' +
-    '</div>' +
-  '</div>';
+async function loadSocioDownloads() {
+  var box = document.getElementById('socioDownloadsBox');
+  if (!box || !supabaseClient) return;
+  try {
+    var res = await supabaseClient.from('socio_downloads').select('*').order('sort_order', { ascending: true }).order('created_at', { ascending: false });
+    if (res.error) { box.innerHTML = '<p class="text-red-400 text-xs">' + escapeHtml(res.error.message) + '</p>'; return; }
+    var list = res.data || [];
+    if (!list.length) { box.innerHTML = '<p class="text-slate-500 text-xs">Nessun file al momento.</p>'; return; }
+    box.innerHTML = '<div class="space-y-2">' + list.map(function(d) {
+      return '<a href="' + escapeHtml(d.file_url) + '" target="_blank" rel="noopener" class="block p-3 rounded-xl border border-slate-700/80 bg-slate-900/50 hover:border-emerald-500/40 hover:bg-slate-800/60 transition">' +
+        '<div class="text-white text-sm font-semibold">' + escapeHtml(d.title) + '</div>' +
+        (d.description ? '<div class="text-slate-400 text-[11px] mt-0.5">' + escapeHtml(d.description) + '</div>' : '') +
+        '<div class="text-emerald-400 text-[10px] mt-1.5 font-semibold">Scarica →</div></a>';
+    }).join('') + '</div>';
+  } catch (e) {
+    box.innerHTML = '<p class="text-red-400 text-xs">Errore caricamento</p>';
+  }
+}
+
+async function loadSocioBoard() {
+  var box = document.getElementById('socioBoardBox');
+  if (!box || !supabaseClient) return;
+  try {
+    var res = await supabaseClient.from('socio_board').select('*').order('pinned', { ascending: false }).order('created_at', { ascending: false });
+    if (res.error) { box.innerHTML = '<p class="text-red-300/80 text-xs">' + escapeHtml(res.error.message) + '</p>'; return; }
+    var list = res.data || [];
+    if (!list.length) { box.innerHTML = '<p class="text-emerald-200/40 text-xs italic">La lavagna è vuota.</p>'; return; }
+    box.innerHTML = list.map(function(m) {
+      var dateStr = m.created_at ? new Date(m.created_at).toLocaleDateString('it-IT') : '';
+      return '<div class="pb-3 border-b border-emerald-500/10 last:border-0">' +
+        (m.pinned ? '<span class="text-[10px] text-emerald-400/80 font-semibold uppercase">Fissato · </span>' : '') +
+        (m.title ? '<div class="text-emerald-100 font-semibold text-sm">' + escapeHtml(m.title) + '</div>' : '') +
+        '<div class="text-emerald-50/85 text-sm leading-relaxed whitespace-pre-wrap mt-0.5">' + escapeHtml(m.body) + '</div>' +
+        (dateStr ? '<div class="text-emerald-200/30 text-[10px] mt-1">' + dateStr + '</div>' : '') +
+      '</div>';
+    }).join('');
+  } catch (e) {
+    box.innerHTML = '<p class="text-red-300/80 text-xs">Errore caricamento</p>';
+  }
 }
 
 function renderAreaYuma() {
@@ -943,6 +980,132 @@ async function deleteYumaBoardPost(id) {
   var res = await supabaseClient.from('yuma_board').delete().eq('id', id);
   if (res.error) { alert(res.error.message); return; }
   loadAdminBoard();
+}
+
+
+
+async function loadAdminSocioDownloads() {
+  var box = document.getElementById('adminSocioDownloadsList');
+  if (!box || !supabaseClient) return;
+  box.innerHTML = '<p class="text-slate-500">Caricamento...</p>';
+  var res = await supabaseClient.from('socio_downloads').select('*').order('sort_order').order('created_at', { ascending: false });
+  if (res.error) { box.innerHTML = '<p class="text-red-400">' + escapeHtml(res.error.message) + '</p>'; return; }
+  var list = res.data || [];
+  if (!list.length) { box.innerHTML = '<p class="text-slate-500">Nessun download.</p>'; return; }
+  box.innerHTML = list.map(function(d) {
+    return '<div class="border border-slate-700 rounded-lg p-2.5 space-y-1.5">' +
+      '<div class="flex justify-between gap-2 items-start">' +
+        '<div class="min-w-0"><div class="text-white font-semibold truncate">' + escapeHtml(d.title) + '</div>' +
+        '<div class="text-slate-500 truncate text-[10px]">' + escapeHtml(d.file_url) + '</div>' +
+        '<div class="text-slate-400 text-[11px]">' + escapeHtml(d.description || '') + '</div></div>' +
+        '<div class="flex gap-2 shrink-0">' +
+          '<button type="button" onclick="editSocioDownload(' + d.id + ')" class="text-sky-400 text-[11px] hover:underline">Modifica</button>' +
+          '<button type="button" onclick="deleteSocioDownload(' + d.id + ')" class="text-red-400 text-[11px] hover:underline">Elimina</button>' +
+        '</div></div>' +
+      '<div id="sdl-edit-' + d.id + '" class="hidden space-y-1.5 pt-1 border-t border-slate-700">' +
+        '<input type="text" id="sdl-edit-title-' + d.id + '" class="auth-input text-xs" value="' + escapeHtml(d.title).replace(/"/g, '&quot;') + '">' +
+        '<input type="text" id="sdl-edit-url-' + d.id + '" class="auth-input text-xs" value="' + escapeHtml(d.file_url).replace(/"/g, '&quot;') + '">' +
+        '<input type="text" id="sdl-edit-desc-' + d.id + '" class="auth-input text-xs" value="' + escapeHtml(d.description || '').replace(/"/g, '&quot;') + '">' +
+        '<div class="flex gap-2">' +
+          '<button type="button" onclick="saveSocioDownload(' + d.id + ')" class="px-2 py-1 rounded bg-emerald-500/20 text-emerald-300 border border-emerald-500/30 text-[11px]">Salva</button>' +
+          '<button type="button" onclick="cancelEditSocioDownload(' + d.id + ')" class="px-2 py-1 rounded text-slate-400 text-[11px]">Annulla</button>' +
+        '</div></div></div>';
+  }).join('');
+}
+function editSocioDownload(id) { var el = document.getElementById('sdl-edit-' + id); if (el) el.classList.remove('hidden'); }
+function cancelEditSocioDownload(id) { var el = document.getElementById('sdl-edit-' + id); if (el) el.classList.add('hidden'); }
+async function saveSocioDownload(id) {
+  if (!isAdmin || !supabaseClient) return;
+  var title = ((document.getElementById('sdl-edit-title-' + id) || {}).value || '').trim();
+  var url = ((document.getElementById('sdl-edit-url-' + id) || {}).value || '').trim();
+  var desc = ((document.getElementById('sdl-edit-desc-' + id) || {}).value || '').trim();
+  if (!title || !url) { alert('Titolo e URL obbligatori.'); return; }
+  var res = await supabaseClient.from('socio_downloads').update({ title: title, file_url: url, description: desc }).eq('id', id).select('id');
+  if (res.error) { alert(res.error.message); return; }
+  if (!res.data || !res.data.length) { alert('Nessuna riga aggiornata.'); return; }
+  loadAdminSocioDownloads();
+}
+async function addSocioDownload() {
+  if (!isAdmin || !supabaseClient) return;
+  var title = ((document.getElementById('sdlTitle') || {}).value || '').trim();
+  var url = ((document.getElementById('sdlUrl') || {}).value || '').trim();
+  var desc = ((document.getElementById('sdlDesc') || {}).value || '').trim();
+  if (!title || !url) { alert('Titolo e URL obbligatori.'); return; }
+  var res = await supabaseClient.from('socio_downloads').insert({ title: title, file_url: url, description: desc, created_by: currentUser && currentUser.id });
+  if (res.error) { alert(res.error.message); return; }
+  document.getElementById('sdlTitle').value = '';
+  document.getElementById('sdlUrl').value = '';
+  document.getElementById('sdlDesc').value = '';
+  loadAdminSocioDownloads();
+}
+async function deleteSocioDownload(id) {
+  if (!isAdmin || !supabaseClient) return;
+  if (!confirm('Eliminare questo download?')) return;
+  var res = await supabaseClient.from('socio_downloads').delete().eq('id', id);
+  if (res.error) { alert(res.error.message); return; }
+  loadAdminSocioDownloads();
+}
+
+async function loadAdminSocioBoard() {
+  var box = document.getElementById('adminSocioBoardList');
+  if (!box || !supabaseClient) return;
+  box.innerHTML = '<p class="text-slate-500">Caricamento...</p>';
+  var res = await supabaseClient.from('socio_board').select('*').order('pinned', { ascending: false }).order('created_at', { ascending: false });
+  if (res.error) { box.innerHTML = '<p class="text-red-400">' + escapeHtml(res.error.message) + '</p>'; return; }
+  var list = res.data || [];
+  if (!list.length) { box.innerHTML = '<p class="text-slate-500">Nessun messaggio.</p>'; return; }
+  box.innerHTML = list.map(function(m) {
+    return '<div class="border border-slate-700 rounded-lg p-2.5 space-y-1.5">' +
+      '<div class="flex justify-between gap-2 items-start">' +
+        '<div class="min-w-0"><div class="text-white font-semibold">' + escapeHtml(m.title || '(senza titolo)') +
+          (m.pinned ? ' <span class="text-emerald-400 text-[10px]">PIN</span>' : '') + '</div>' +
+        '<div class="text-slate-400 mt-0.5 whitespace-pre-wrap text-[11px]">' + escapeHtml(m.body) + '</div></div>' +
+        '<div class="flex gap-2 shrink-0">' +
+          '<button type="button" onclick="editSocioBoardPost(' + m.id + ')" class="text-sky-400 text-[11px] hover:underline">Modifica</button>' +
+          '<button type="button" onclick="deleteSocioBoardPost(' + m.id + ')" class="text-red-400 text-[11px] hover:underline">Elimina</button>' +
+        '</div></div>' +
+      '<div id="sbd-edit-' + m.id + '" class="hidden space-y-1.5 pt-1 border-t border-slate-700">' +
+        '<input type="text" id="sbd-edit-title-' + m.id + '" class="auth-input text-xs" value="' + escapeHtml(m.title || '').replace(/"/g, '&quot;') + '">' +
+        '<textarea id="sbd-edit-body-' + m.id + '" rows="3" class="auth-input text-xs resize-none">' + escapeHtml(m.body) + '</textarea>' +
+        '<label class="flex items-center gap-2 text-[11px] text-slate-400"><input type="checkbox" id="sbd-edit-pin-' + m.id + '"' + (m.pinned ? ' checked' : '') + '> Fissa in alto</label>' +
+        '<div class="flex gap-2">' +
+          '<button type="button" onclick="saveSocioBoardPost(' + m.id + ')" class="px-2 py-1 rounded bg-emerald-500/20 text-emerald-300 border border-emerald-500/30 text-[11px]">Salva</button>' +
+          '<button type="button" onclick="cancelEditSocioBoardPost(' + m.id + ')" class="px-2 py-1 rounded text-slate-400 text-[11px]">Annulla</button>' +
+        '</div></div></div>';
+  }).join('');
+}
+function editSocioBoardPost(id) { var el = document.getElementById('sbd-edit-' + id); if (el) el.classList.remove('hidden'); }
+function cancelEditSocioBoardPost(id) { var el = document.getElementById('sbd-edit-' + id); if (el) el.classList.add('hidden'); }
+async function saveSocioBoardPost(id) {
+  if (!isAdmin || !supabaseClient) return;
+  var title = ((document.getElementById('sbd-edit-title-' + id) || {}).value || '').trim();
+  var body = ((document.getElementById('sbd-edit-body-' + id) || {}).value || '').trim();
+  var pinned = !!(document.getElementById('sbd-edit-pin-' + id) || {}).checked;
+  if (!body) { alert('Il testo è obbligatorio.'); return; }
+  var res = await supabaseClient.from('socio_board').update({ title: title, body: body, pinned: pinned, updated_at: new Date().toISOString() }).eq('id', id).select('id');
+  if (res.error) { alert(res.error.message); return; }
+  if (!res.data || !res.data.length) { alert('Nessuna riga aggiornata.'); return; }
+  loadAdminSocioBoard();
+}
+async function addSocioBoardPost() {
+  if (!isAdmin || !supabaseClient) return;
+  var title = ((document.getElementById('sboardTitle') || {}).value || '').trim();
+  var body = ((document.getElementById('sboardBody') || {}).value || '').trim();
+  var pinned = !!(document.getElementById('sboardPinned') || {}).checked;
+  if (!body) { alert('Scrivi un messaggio.'); return; }
+  var res = await supabaseClient.from('socio_board').insert({ title: title, body: body, pinned: pinned, created_by: currentUser && currentUser.id });
+  if (res.error) { alert(res.error.message); return; }
+  document.getElementById('sboardTitle').value = '';
+  document.getElementById('sboardBody').value = '';
+  document.getElementById('sboardPinned').checked = false;
+  loadAdminSocioBoard();
+}
+async function deleteSocioBoardPost(id) {
+  if (!isAdmin || !supabaseClient) return;
+  if (!confirm('Eliminare questo messaggio?')) return;
+  var res = await supabaseClient.from('socio_board').delete().eq('id', id);
+  if (res.error) { alert(res.error.message); return; }
+  loadAdminSocioBoard();
 }
 
 

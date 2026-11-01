@@ -236,8 +236,10 @@
       <button type="button" onclick="showAdminTab('roster')" id="tab-roster" class="admin-tab px-3 py-1.5 rounded-lg bg-slate-800/60 text-slate-400 border border-slate-700">Equipaggio</button>
       <button type="button" onclick="showAdminTab('users')" id="tab-users" class="admin-tab px-3 py-1.5 rounded-lg bg-slate-800/60 text-slate-400 border border-slate-700">Utenti</button>
       <button type="button" onclick="showAdminTab('system')" id="tab-system" class="admin-tab px-3 py-1.5 rounded-lg bg-slate-800/60 text-slate-400 border border-slate-700">Sistema</button>
-      <button type="button" onclick="showAdminTab('downloads')" id="tab-downloads" class="admin-tab px-3 py-1.5 rounded-lg bg-slate-800/60 text-slate-400 border border-slate-700">Download</button>
-      <button type="button" onclick="showAdminTab('board')" id="tab-board" class="admin-tab px-3 py-1.5 rounded-lg bg-slate-800/60 text-slate-400 border border-slate-700">Bacheca</button>
+      <button type="button" onclick="showAdminTab('downloads')" id="tab-downloads" class="admin-tab px-3 py-1.5 rounded-lg bg-slate-800/60 text-slate-400 border border-slate-700">Download YUMA</button>
+      <button type="button" onclick="showAdminTab('board')" id="tab-board" class="admin-tab px-3 py-1.5 rounded-lg bg-slate-800/60 text-slate-400 border border-slate-700">Bacheca YUMA</button>
+      <button type="button" onclick="showAdminTab('socio_dl')" id="tab-socio_dl" class="admin-tab px-3 py-1.5 rounded-lg bg-slate-800/60 text-slate-400 border border-slate-700">Download Soci</button>
+      <button type="button" onclick="showAdminTab('socio_board')" id="tab-socio_board" class="admin-tab px-3 py-1.5 rounded-lg bg-slate-800/60 text-slate-400 border border-slate-700">Bacheca Soci</button>
     </div>
     <div id="adminTab-content" class="space-y-4 text-left">
       <div class="bg-sky-500/10 border border-sky-500/25 p-3 rounded-lg text-sky-300 text-xs">Modifica i testi. Poi <strong>Salva</strong>.</div>
@@ -299,6 +301,28 @@
         <button type="button" onclick="addYumaBoardPost()" class="btn-primary text-sm">Pubblica in bacheca</button>
       </div>
       <div id="adminBoardList" class="space-y-2 text-xs"><p class="text-slate-500">Caricamento...</p></div>
+    </div>
+
+    
+    <div id="adminTab-socio_dl" class="hidden space-y-4 text-left">
+      <div class="bg-emerald-500/10 border border-emerald-500/25 p-3 rounded-lg text-emerald-300 text-xs">File scaricabili nell'area <strong>Soci</strong>.</div>
+      <div class="grid gap-2">
+        <input type="text" id="sdlTitle" class="auth-input text-sm" placeholder="Titolo file">
+        <input type="text" id="sdlUrl" class="auth-input text-sm" placeholder="URL download">
+        <input type="text" id="sdlDesc" class="auth-input text-sm" placeholder="Descrizione (opzionale)">
+        <button type="button" onclick="addSocioDownload()" class="btn-primary text-sm">Aggiungi download</button>
+      </div>
+      <div id="adminSocioDownloadsList" class="space-y-2 text-xs"><p class="text-slate-500">Caricamento...</p></div>
+    </div>
+    <div id="adminTab-socio_board" class="hidden space-y-4 text-left">
+      <div class="bg-emerald-500/10 border border-emerald-500/25 p-3 rounded-lg text-emerald-300 text-xs">Bacheca messaggi per l'area <strong>Soci</strong>.</div>
+      <div class="grid gap-2">
+        <input type="text" id="sboardTitle" class="auth-input text-sm" placeholder="Titolo (opzionale)">
+        <textarea id="sboardBody" rows="3" class="auth-input text-sm resize-none" placeholder="Testo del messaggio..."></textarea>
+        <label class="flex items-center gap-2 text-xs text-slate-400"><input type="checkbox" id="sboardPinned" class="rounded"> Fissa in alto</label>
+        <button type="button" onclick="addSocioBoardPost()" class="btn-primary text-sm">Pubblica in bacheca</button>
+      </div>
+      <div id="adminSocioBoardList" class="space-y-2 text-xs"><p class="text-slate-500">Caricamento...</p></div>
     </div>
 
         <div class="flex justify-between items-center border-t border-slate-800 pt-4 mt-5">
