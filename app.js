@@ -790,11 +790,52 @@ async function loadAdminDownloads() {
   var list = res.data || [];
   if (!list.length) { box.innerHTML = '<p class="text-slate-500">Nessun download.</p>'; return; }
   box.innerHTML = list.map(function(d) {
-    return '<div class="border border-slate-700 rounded-lg p-2.5 flex justify-between gap-2 items-start">' +
-      '<div class="min-w-0"><div class="text-white font-semibold truncate">' + escapeHtml(d.title) + '</div>' +
-      '<div class="text-slate-500 truncate text-[10px]">' + escapeHtml(d.file_url) + '</div></div>' +
-      '<button type="button" onclick="deleteYumaDownload(' + d.id + ')" class="text-red-400 text-[11px] shrink-0 hover:underline">Elimina</button></div>';
+    return '<div class="border border-slate-700 rounded-lg p-2.5 space-y-1.5" id="dl-row-' + d.id + '">' +
+      '<div class="flex justify-between gap-2 items-start">' +
+        '<div class="min-w-0">' +
+          '<div class="text-white font-semibold truncate" id="dl-view-title-' + d.id + '">' + escapeHtml(d.title) + '</div>' +
+          '<div class="text-slate-500 truncate text-[10px]" id="dl-view-url-' + d.id + '">' + escapeHtml(d.file_url) + '</div>' +
+          '<div class="text-slate-400 text-[11px]" id="dl-view-desc-' + d.id + '">' + escapeHtml(d.description || '') + '</div>' +
+        '</div>' +
+        '<div class="flex gap-2 shrink-0">' +
+          '<button type="button" onclick="editYumaDownload(' + d.id + ')" class="text-sky-400 text-[11px] hover:underline">Modifica</button>' +
+          '<button type="button" onclick="deleteYumaDownload(' + d.id + ')" class="text-red-400 text-[11px] hover:underline">Elimina</button>' +
+        '</div>' +
+      '</div>' +
+      '<div id="dl-edit-' + d.id + '" class="hidden space-y-1.5 pt-1 border-t border-slate-700">' +
+        '<input type="text" id="dl-edit-title-' + d.id + '" class="auth-input text-xs" value="' + escapeHtml(d.title).replace(/"/g, '&quot;') + '">' +
+        '<input type="text" id="dl-edit-url-' + d.id + '" class="auth-input text-xs" value="' + escapeHtml(d.file_url).replace(/"/g, '&quot;') + '">' +
+        '<input type="text" id="dl-edit-desc-' + d.id + '" class="auth-input text-xs" value="' + escapeHtml(d.description || '').replace(/"/g, '&quot;') + '">' +
+        '<div class="flex gap-2">' +
+          '<button type="button" onclick="saveYumaDownload(' + d.id + ')" class="px-2 py-1 rounded bg-sky-500/20 text-sky-300 border border-sky-500/30 text-[11px]">Salva</button>' +
+          '<button type="button" onclick="cancelEditYumaDownload(' + d.id + ')" class="px-2 py-1 rounded text-slate-400 text-[11px]">Annulla</button>' +
+        '</div>' +
+      '</div>' +
+    '</div>';
   }).join('');
+}
+
+function editYumaDownload(id) {
+  var ed = document.getElementById('dl-edit-' + id);
+  if (ed) ed.classList.remove('hidden');
+}
+function cancelEditYumaDownload(id) {
+  var ed = document.getElementById('dl-edit-' + id);
+  if (ed) ed.classList.add('hidden');
+}
+async function saveYumaDownload(id) {
+  if (!isAdmin || !supabaseClient) return;
+  var title = (document.getElementById('dl-edit-title-' + id) || {}).value || '';
+  var url = (document.getElementById('dl-edit-url-' + id) || {}).value || '';
+  var desc = (document.getElementById('dl-edit-desc-' + id) || {}).value || '';
+  title = title.trim(); url = url.trim(); desc = desc.trim();
+  if (!title || !url) { alert('Titolo e URL obbligatori.'); return; }
+  var res = await supabaseClient.from('yuma_downloads').update({
+    title: title, file_url: url, description: desc || ''
+  }).eq('id', id).select('id');
+  if (res.error) { alert(res.error.message); return; }
+  if (!res.data || !res.data.length) { alert('Nessuna riga aggiornata (policy RLS?).'); return; }
+  loadAdminDownloads();
 }
 
 async function addYumaDownload() {
@@ -832,12 +873,51 @@ async function loadAdminBoard() {
   var list = res.data || [];
   if (!list.length) { box.innerHTML = '<p class="text-slate-500">Nessun messaggio.</p>'; return; }
   box.innerHTML = list.map(function(m) {
-    return '<div class="border border-slate-700 rounded-lg p-2.5">' +
-      '<div class="flex justify-between gap-2"><div class="text-white font-semibold">' + escapeHtml(m.title || '(senza titolo)') +
-      (m.pinned ? ' <span class="text-amber-400 text-[10px]">PIN</span>' : '') + '</div>' +
-      '<button type="button" onclick="deleteYumaBoardPost(' + m.id + ')" class="text-red-400 text-[11px] hover:underline">Elimina</button></div>' +
-      '<div class="text-slate-400 mt-1 whitespace-pre-wrap">' + escapeHtml(m.body) + '</div></div>';
+    return '<div class="border border-slate-700 rounded-lg p-2.5 space-y-1.5" id="bd-row-' + m.id + '">' +
+      '<div class="flex justify-between gap-2 items-start">' +
+        '<div class="min-w-0">' +
+          '<div class="text-white font-semibold" id="bd-view-title-' + m.id + '">' + escapeHtml(m.title || '(senza titolo)') +
+            (m.pinned ? ' <span class="text-amber-400 text-[10px]">PIN</span>' : '') + '</div>' +
+          '<div class="text-slate-400 mt-0.5 whitespace-pre-wrap text-[11px]" id="bd-view-body-' + m.id + '">' + escapeHtml(m.body) + '</div>' +
+        '</div>' +
+        '<div class="flex gap-2 shrink-0">' +
+          '<button type="button" onclick="editYumaBoardPost(' + m.id + ')" class="text-sky-400 text-[11px] hover:underline">Modifica</button>' +
+          '<button type="button" onclick="deleteYumaBoardPost(' + m.id + ')" class="text-red-400 text-[11px] hover:underline">Elimina</button>' +
+        '</div>' +
+      '</div>' +
+      '<div id="bd-edit-' + m.id + '" class="hidden space-y-1.5 pt-1 border-t border-slate-700">' +
+        '<input type="text" id="bd-edit-title-' + m.id + '" class="auth-input text-xs" value="' + escapeHtml(m.title || '').replace(/"/g, '&quot;') + '">' +
+        '<textarea id="bd-edit-body-' + m.id + '" rows="3" class="auth-input text-xs resize-none">' + escapeHtml(m.body) + '</textarea>' +
+        '<label class="flex items-center gap-2 text-[11px] text-slate-400"><input type="checkbox" id="bd-edit-pin-' + m.id + '"' + (m.pinned ? ' checked' : '') + '> Fissa in alto</label>' +
+        '<div class="flex gap-2">' +
+          '<button type="button" onclick="saveYumaBoardPost(' + m.id + ')" class="px-2 py-1 rounded bg-sky-500/20 text-sky-300 border border-sky-500/30 text-[11px]">Salva</button>' +
+          '<button type="button" onclick="cancelEditYumaBoardPost(' + m.id + ')" class="px-2 py-1 rounded text-slate-400 text-[11px]">Annulla</button>' +
+        '</div>' +
+      '</div>' +
+    '</div>';
   }).join('');
+}
+
+function editYumaBoardPost(id) {
+  var ed = document.getElementById('bd-edit-' + id);
+  if (ed) ed.classList.remove('hidden');
+}
+function cancelEditYumaBoardPost(id) {
+  var ed = document.getElementById('bd-edit-' + id);
+  if (ed) ed.classList.add('hidden');
+}
+async function saveYumaBoardPost(id) {
+  if (!isAdmin || !supabaseClient) return;
+  var title = ((document.getElementById('bd-edit-title-' + id) || {}).value || '').trim();
+  var body = ((document.getElementById('bd-edit-body-' + id) || {}).value || '').trim();
+  var pinned = !!(document.getElementById('bd-edit-pin-' + id) || {}).checked;
+  if (!body) { alert('Il testo del messaggio è obbligatorio.'); return; }
+  var res = await supabaseClient.from('yuma_board').update({
+    title: title, body: body, pinned: pinned, updated_at: new Date().toISOString()
+  }).eq('id', id).select('id');
+  if (res.error) { alert(res.error.message); return; }
+  if (!res.data || !res.data.length) { alert('Nessuna riga aggiornata (policy RLS?).'); return; }
+  loadAdminBoard();
 }
 
 async function addYumaBoardPost() {
