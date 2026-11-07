@@ -1,4 +1,4 @@
-/* YUMA – Regolamento: regole numerate (crea / cancella / salva) gestite da Admin */
+/* YUMA – Regolamento: regole numerate (crea / modifica / cancella) gestite da Admin */
 (function () {
   var regoleCache = []; // [{ id, testo }]
 
@@ -14,7 +14,6 @@
     if (!raw) return [];
     var s = String(raw).trim();
     if (!s) return [];
-    // JSON array
     if (s.charAt(0) === '[') {
       try {
         var arr = JSON.parse(s);
@@ -31,7 +30,6 @@
         }
       } catch (e) {}
     }
-    // Fallback: testo semplice, una regola per riga numerata o vuota
     return s
       .split(/\n+/)
       .map(function (line) { return line.replace(/^\s*\d+[.)\-:]\s*/, '').trim(); })
@@ -41,9 +39,11 @@
 
   function regoleToJson(list) {
     return JSON.stringify(
-      (list || []).map(function (r, i) {
-        return { id: r.id || 'r' + i, testo: (r.testo || '').trim() };
-      }).filter(function (r) { return r.testo; })
+      (list || [])
+        .map(function (r, i) {
+          return { id: r.id || 'r' + i, testo: (r.testo || '').trim() };
+        })
+        .filter(function (r) { return r.testo; })
     );
   }
 
@@ -117,40 +117,98 @@
     list.innerHTML = regoleCache
       .map(function (r, i) {
         return (
-          '<div class="flex gap-2 items-start bg-slate-900/50 border border-slate-700 rounded-xl p-2.5" data-regola-id="' +
+          '<div class="bg-slate-900/50 border border-slate-700 rounded-xl p-3 space-y-2" data-regola-id="' +
           escapeHtml(r.id) +
           '">' +
-          '<span class="shrink-0 w-7 h-7 rounded-md bg-amber-500/20 text-amber-400 font-orbitron font-bold text-xs flex items-center justify-center mt-0.5">' +
+          '<div class="flex items-center gap-2">' +
+          '<span class="shrink-0 w-7 h-7 rounded-md bg-amber-500/20 text-amber-400 font-orbitron font-bold text-xs flex items-center justify-center">' +
           (i + 1) +
           '</span>' +
-          '<textarea class="auth-input text-xs flex-1 min-h-[60px] resize-y regola-testo" rows="2">' +
-          escapeHtml(r.testo) +
-          '</textarea>' +
-          '<button type="button" class="shrink-0 text-red-400 hover:text-red-300 text-xs font-semibold px-2 py-1 rounded-lg hover:bg-red-500/10" data-del-regola="' +
+          '<span class="text-[11px] text-slate-400 uppercase tracking-wider font-semibold flex-1">Regola ' +
+          (i + 1) +
+          '</span>' +
+          '<button type="button" class="text-sky-400 hover:text-sky-300 text-xs font-semibold px-2.5 py-1 rounded-lg hover:bg-sky-500/10 border border-sky-500/30" data-edit-regola="' +
+          escapeHtml(r.id) +
+          '">Modifica</button>' +
+          '<button type="button" class="text-red-400 hover:text-red-300 text-xs font-semibold px-2.5 py-1 rounded-lg hover:bg-red-500/10 border border-red-500/30" data-del-regola="' +
           escapeHtml(r.id) +
           '">Elimina</button>' +
-          '</div>'
+          '</div>' +
+          '<div class="regola-view text-slate-300 text-xs leading-relaxed px-1">' +
+          escapeHtml(r.testo) +
+          '</div>' +
+          '<div class="regola-edit hidden space-y-2">' +
+          '<textarea class="auth-input text-xs w-full min-h-[70px] resize-y regola-testo" rows="3">' +
+          escapeHtml(r.testo) +
+          '</textarea>' +
+          '<div class="flex gap-2">' +
+          '<button type="button" class="btn-secondary text-xs py-1.5 px-3 flex-1" data-save-edit="' +
+          escapeHtml(r.id) +
+          '">Conferma modifica</button>' +
+          '<button type="button" class="text-slate-400 hover:text-slate-200 text-xs py-1.5 px-3 rounded-lg hover:bg-slate-700/50" data-cancel-edit="' +
+          escapeHtml(r.id) +
+          '">Annulla</button>' +
+          '</div></div></div>'
         );
       })
       .join('');
 
+    // Elimina
     list.querySelectorAll('[data-del-regola]').forEach(function (btn) {
       btn.addEventListener('click', function () {
         var id = btn.getAttribute('data-del-regola');
-        if (!confirm('Eliminare la regola n. ' + (regoleCache.findIndex(function (x) { return x.id === id; }) + 1) + '?')) return;
+        var idx = regoleCache.findIndex(function (x) { return x.id === id; });
+        if (!confirm('Eliminare la regola n. ' + (idx + 1) + '?')) return;
         regoleCache = regoleCache.filter(function (r) { return r.id !== id; });
         renderAdminRegole();
         renderPublicRegole();
       });
     });
 
-    list.querySelectorAll('.regola-testo').forEach(function (ta) {
-      ta.addEventListener('change', function () {
-        var row = ta.closest('[data-regola-id]');
+    // Modifica → mostra textarea
+    list.querySelectorAll('[data-edit-regola]').forEach(function (btn) {
+      btn.addEventListener('click', function () {
+        var id = btn.getAttribute('data-edit-regola');
+        var row = list.querySelector('[data-regola-id="' + id + '"]');
         if (!row) return;
-        var id = row.getAttribute('data-regola-id');
+        // Chiudi altre edit aperte
+        list.querySelectorAll('.regola-edit').forEach(function (el) { el.classList.add('hidden'); });
+        list.querySelectorAll('.regola-view').forEach(function (el) { el.classList.remove('hidden'); });
+        var view = row.querySelector('.regola-view');
+        var edit = row.querySelector('.regola-edit');
+        var ta = row.querySelector('.regola-testo');
+        if (view) view.classList.add('hidden');
+        if (edit) edit.classList.remove('hidden');
+        if (ta) {
+          ta.value = (regoleCache.find(function (r) { return r.id === id; }) || {}).testo || '';
+          ta.focus();
+        }
+      });
+    });
+
+    // Conferma modifica
+    list.querySelectorAll('[data-save-edit]').forEach(function (btn) {
+      btn.addEventListener('click', function () {
+        var id = btn.getAttribute('data-save-edit');
+        var row = list.querySelector('[data-regola-id="' + id + '"]');
+        if (!row) return;
+        var ta = row.querySelector('.regola-testo');
+        var testo = ta ? ta.value.trim() : '';
+        if (!testo) {
+          alert('Il testo della regola non può essere vuoto.');
+          return;
+        }
         var item = regoleCache.find(function (r) { return r.id === id; });
-        if (item) item.testo = ta.value;
+        if (item) item.testo = testo;
+        renderAdminRegole();
+        renderPublicRegole();
+      });
+    });
+
+    // Annulla modifica
+    list.querySelectorAll('[data-cancel-edit]').forEach(function (btn) {
+      btn.addEventListener('click', function () {
+        renderAdminRegole();
       });
     });
   }
@@ -161,8 +219,11 @@
     list.querySelectorAll('[data-regola-id]').forEach(function (row) {
       var id = row.getAttribute('data-regola-id');
       var ta = row.querySelector('.regola-testo');
-      var item = regoleCache.find(function (r) { return r.id === id; });
-      if (item && ta) item.testo = ta.value;
+      var edit = row.querySelector('.regola-edit');
+      if (ta && edit && !edit.classList.contains('hidden')) {
+        var item = regoleCache.find(function (r) { return r.id === id; });
+        if (item) item.testo = ta.value;
+      }
     });
   }
 
@@ -175,7 +236,7 @@
     box.className = 'border-t border-slate-700/80 pt-4 mt-2 space-y-3';
     box.innerHTML =
       '<div class="bg-amber-500/10 border border-amber-500/25 p-3 rounded-lg text-amber-200 text-xs">' +
-      'Gestisci le <strong>regole una per una</strong>. Aggiungi, modifica o elimina, poi premi <strong>Salva</strong> in basso.' +
+      '<strong>Regolamento</strong>: crea, <strong>modifica</strong> o elimina le regole una per una. Poi premi <strong>Salva</strong>.' +
       '</div>' +
       '<div>' +
       '<label class="block text-[11px] text-amber-400 mb-1 uppercase tracking-wider font-semibold">Titolo sezione</label>' +
@@ -183,11 +244,11 @@
       '</div>' +
       '<div>' +
       '<label class="block text-[11px] text-amber-400 mb-2 uppercase tracking-wider font-semibold">Regole</label>' +
-      '<div id="adminRegoleList" class="space-y-2 max-h-64 overflow-y-auto mb-3"></div>' +
+      '<div id="adminRegoleList" class="space-y-2 max-h-72 overflow-y-auto mb-3"></div>' +
       '</div>' +
       '<div class="border border-sky-500/25 rounded-xl p-3 space-y-2 bg-sky-500/5">' +
       '<h4 class="text-sky-400 font-bold text-[11px] uppercase tracking-wider">Nuova regola</h4>' +
-      '<textarea id="new-regola-testo" rows="2" class="auth-input text-xs resize-y" placeholder="Scrivi il testo della regola..."></textarea>' +
+      '<textarea id="new-regola-testo" rows="2" class="auth-input text-xs resize-y" placeholder="Scrivi il testo della nuova regola..."></textarea>' +
       '<button type="button" id="btn-add-regola" class="btn-secondary text-xs w-full py-2">+ Aggiungi regola</button>' +
       '</div>';
     tab.appendChild(box);
@@ -215,7 +276,6 @@
     renderAdminRegole();
   }
 
-  // Patch saveChanges: include regole JSON + titolo
   var _save = window.saveChanges;
   window.saveChanges = async function () {
     if (!currentUser || !isAdmin || !supabaseClient) return;
@@ -242,11 +302,10 @@
     }
     applyRegolamento(payload);
     if (typeof applyContent === 'function') {
-      // applica anche hero senza sovrascrivere regolamento
-      var _apply = window.applyContent;
-      if (_apply) {
-        try { _apply(payload); } catch (e) {}
-      }
+      try {
+        var _apply = window.applyContent;
+        // evita loop: applyContent chiama già applyRegolamento via patch
+      } catch (e) {}
     }
     if (typeof closeAdminPanel === 'function') closeAdminPanel();
     alert('Salvato. Regole: ' + regoleCache.length);
