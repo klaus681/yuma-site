@@ -1,1 +1,38 @@
-PLACEHOLDER
+<!DOCTYPE html>
+<html lang="it">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>YUMA Team – caricamento…</title>
+  <style>body{background:#020617;color:#94a3b8;font-family:system-ui;display:flex;align-items:center;justify-content:center;min-height:100vh;margin:0}</style>
+</head>
+<body>
+  <p id="msg">Caricamento YUMA Team…</p>
+  <script>
+  (function () {
+    var GOOD = 'https://cdn.jsdelivr.net/gh/klaus681/yuma-site@e510633a9f9bf0c7821e1ddf3368c2e18b06a18a/';
+    Promise.all([
+      fetch(GOOD + 'index.html').then(function (r) { return r.text(); }),
+      fetch(GOOD + 'app.js').then(function (r) { return r.text(); })
+    ]).then(function (parts) {
+      var html = parts[0];
+      var app = parts[1];
+      // inject regolamento addon script tag before </body>
+      html = html.replace(
+        /<script\s+src=["']app\.js["']><\/script>/i,
+        '<script src="app.js"></script>\n<script src="regolamento-addon.js"></script>'
+      );
+      // Serve app.js from a blob URL so relative path works after document.write
+      var blob = new Blob([app], { type: 'application/javascript' });
+      var appUrl = URL.createObjectURL(blob);
+      html = html.replace(/src=["']app\.js["']/g, 'src="' + appUrl + '"');
+      document.open();
+      document.write(html);
+      document.close();
+    }).catch(function (err) {
+      document.getElementById('msg').textContent = 'Errore di caricamento: ' + err;
+    });
+  })();
+  </script>
+</body>
+</html>
