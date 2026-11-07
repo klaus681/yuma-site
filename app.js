@@ -1,5 +1,17 @@
-/* YUMA app.js – full build with Regolamento support */
-(function(){
-  var b64 = "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";
-  console.error('YUMA: incomplete push - use app.source.js');
+/* YUMA app.js
+ * Sorgente completo dell'app (auth, admin, roster, ecc.) caricato dal commit stabile.
+ * Le patch Regolamento sono in regolamento-addon.js
+ */
+(function () {
+  var s = document.createElement('script');
+  s.src = 'https://cdn.jsdelivr.net/gh/klaus681/yuma-site@e510633a9f9bf0c7821e1ddf3368c2e18b06a18a/app.js';
+  s.onload = function () {
+    var a = document.createElement('script');
+    a.src = 'regolamento-addon.js';
+    document.head.appendChild(a);
+  };
+  s.onerror = function () {
+    console.error('YUMA: impossibile caricare app.js dal CDN');
+  };
+  document.head.appendChild(s);
 })();
