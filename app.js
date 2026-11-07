@@ -1,17 +1,20 @@
 /* YUMA app.js
- * Sorgente completo dell'app (auth, admin, roster, ecc.) caricato dal commit stabile.
- * Le patch Regolamento sono in regolamento-addon.js
+ * 1) Carica il core completo dal commit stabile e510633
+ * 2) Poi carica regolamento-addon.js (sezione + admin + salvataggio)
  */
 (function () {
-  var s = document.createElement('script');
-  s.src = 'https://cdn.jsdelivr.net/gh/klaus681/yuma-site@e510633a9f9bf0c7821e1ddf3368c2e18b06a18a/app.js';
-  s.onload = function () {
-    var a = document.createElement('script');
-    a.src = 'regolamento-addon.js';
-    document.head.appendChild(a);
+  var core = document.createElement('script');
+  core.src = 'https://cdn.jsdelivr.net/gh/klaus681/yuma-site@e510633a9f9bf0c7821e1ddf3368c2e18b06a18a/app.js';
+  core.onload = function () {
+    var addon = document.createElement('script');
+    addon.src = 'regolamento-addon.js';
+    addon.onerror = function () {
+      console.error('YUMA: regolamento-addon.js non trovato');
+    };
+    document.head.appendChild(addon);
   };
-  s.onerror = function () {
-    console.error('YUMA: impossibile caricare app.js dal CDN');
+  core.onerror = function () {
+    console.error('YUMA: impossibile caricare app core dal CDN');
   };
-  document.head.appendChild(s);
+  document.head.appendChild(core);
 })();
