@@ -23,6 +23,15 @@ URL e anon key sono già in `index.html` e in `config.js`.
 ## Tabelle
 | Tabella | Uso |
 |---------|-----|
-| site_content | Testi del sito (hero, equipaggio) |
+| site_content | Testi del sito (hero, regolamento, equipaggio) |
 | candidature | Form Unisciti a noi |
 | profiles | Ruolo utente (admin / member) |
+
+
+## Migrazione Regolamento
+Se il progetto esiste già, esegui nel SQL Editor:
+
+```sql
+alter table public.site_content add column if not exists regolamento text default '';
+alter table public.site_content add column if not exists regolamento_title text default 'Regolamento';
+```

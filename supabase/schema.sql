@@ -10,6 +10,8 @@ create table if not exists public.site_content (
   slogan text not null default '25 Anni in Rotta Insieme',
   subtext text not null default 'Un viaggio di amicizia, passione e cameratismo sui mari di Virtual Skipper',
   bg_url text,
+  regolamento text default '',
+  regolamento_title text default 'Regolamento',
   m1_name text default 'Skipper Founder',
   m1_role text default 'Timoniere & Fondatore',
   m1_desc text default 'Presente dal 2001. Specialista in partenze e tattica di regata.',
@@ -137,3 +139,11 @@ create policy "read own profile"
     select 1 from public.profiles p
     where p.id = auth.uid() and p.role = 'admin'
   ));
+
+
+-- ============================================================
+-- MIGRAZIONE (se hai già eseguito lo schema precedente)
+-- Esegui solo queste righe nel SQL Editor:
+-- ============================================================
+-- alter table public.site_content add column if not exists regolamento text default '';
+-- alter table public.site_content add column if not exists regolamento_title text default 'Regolamento';
