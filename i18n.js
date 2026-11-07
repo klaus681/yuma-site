@@ -15,7 +15,12 @@ var I18N = {
     nav_storia: "La Storia",
     nav_trofei: "Trofei",
     nav_roster: "Equipaggio",
+    nav_regolamento: "Regolamento",
     nav_unisciti: "Unisciti",
+    regolamento_label: "Regole di Bordo",
+    regolamento_title: "Regolamento",
+    regolamento_desc: "Le regole del team YUMA: rispetto, fair play e spirito di squadra.",
+    regolamento_empty: "Il regolamento verrà pubblicato a breve dall'amministrazione.",
     nav_area: "YUMA Only",
     nav_login: "Accedi",
     nav_register: "Registrati",
@@ -118,7 +123,12 @@ var I18N = {
     nav_storia: "History",
     nav_trofei: "Trophies",
     nav_roster: "Crew",
+    nav_regolamento: "Rules",
     nav_unisciti: "Join Us",
+    regolamento_label: "Ship Rules",
+    regolamento_title: "Regulations",
+    regolamento_desc: "YUMA team rules: respect, fair play and team spirit.",
+    regolamento_empty: "The regulations will be published shortly by the administration.",
     nav_area: "YUMA Only",
     nav_login: "Log in",
     nav_register: "Sign up",
@@ -221,7 +231,12 @@ var I18N = {
     nav_storia: "Historia",
     nav_trofei: "Trofeos",
     nav_roster: "Tripulación",
+    nav_regolamento: "Reglamento",
     nav_unisciti: "Únete",
+    regolamento_label: "Reglas de a Bordo",
+    regolamento_title: "Reglamento",
+    regolamento_desc: "Las reglas del equipo YUMA: respeto, juego limpio y espíritu de equipo.",
+    regolamento_empty: "El reglamento se publicará en breve por la administración.",
     nav_area: "YUMA Only",
     nav_login: "Entrar",
     nav_register: "Registrarse",
@@ -324,7 +339,12 @@ var I18N = {
     nav_storia: "Histoire",
     nav_trofei: "Trophées",
     nav_roster: "Équipage",
+    nav_regolamento: "Règlement",
     nav_unisciti: "Rejoindre",
+    regolamento_label: "Règles de Bord",
+    regolamento_title: "Règlement",
+    regolamento_desc: "Les règles de l'équipe YUMA : respect, fair-play et esprit d'équipe.",
+    regolamento_empty: "Le règlement sera publié prochainement par l'administration.",
     nav_area: "YUMA Only",
     nav_login: "Connexion",
     nav_register: "S'inscrire",
@@ -372,7 +392,7 @@ var I18N = {
     form_submit: "Envoyer la Candidature",
     form_success: "⛵ Candidature envoyée avec succès ! Nous vous recontacterons bientôt.",
     form_placeholder_nome: "ex. Skipper_99",
-    form_placeholder_contatto: "ton-nom#1234 ou email",
+    form_placeholder_contatto: "ton-pseudo#1234 ou email",
     form_placeholder_msg: "Parlez-nous un peu de vous...",
     area_label: "YUMA Only",
     area_title: "YUMA Only",
@@ -383,7 +403,7 @@ var I18N = {
     area_next: "Prochaines étapes",
     area_next1: "• Rejoignez le canal Discord de l'équipe",
     area_next2: "• Participez aux régates et entraînements",
-    area_next3: "• Contactez un admin pour toute question",
+    area_next3: "• Contactez un admin en cas de doute",
     area_members: "Membres approuvés",
     area_members_none: "Pas encore d'autres membres.",
     area_role_yuma: "Membre de l'équipe YUMA – régates, tactique et camaraderie.",
@@ -392,14 +412,14 @@ var I18N = {
     login_title: "Connexion",
     login_email: "Email",
     login_pass: "Mot de passe",
-    login_btn: "Se connecter",
+    login_btn: "Entrer",
     login_no_account: "Pas encore de compte ?",
     reg_title: "S'inscrire",
     reg_name: "Nom / Pseudo",
     reg_email: "Email",
     reg_pass: "Mot de passe",
     reg_btn: "Envoyer la demande",
-    reg_have_account: "Vous avez déjà un compte ?",
+    reg_have_account: "Déjà un compte ?",
     footer: "TEAM VSK · 1999/2001 – 2026",
     footer_sub: "25 Ans de Cap Ensemble",
     alert_pending: "Compte en attente d'approbation par l'admin.",
@@ -415,57 +435,42 @@ var I18N = {
   }
 };
 
-var currentLang = localStorage.getItem('yuma_lang') || 'it';
-
-function t(key, vars) {
-  var dict = I18N[currentLang] || I18N.it;
-  var s = dict[key] != null ? dict[key] : (I18N.it[key] || key);
-  if (vars) {
-    Object.keys(vars).forEach(function(k) {
-      s = s.replace(new RegExp('\\{' + k + '\\}', 'g'), vars[k]);
-    });
-  }
-  return s;
+function t(key) {
+  var lang = localStorage.getItem('yuma_lang') || 'it';
+  var dict = I18N[lang] || I18N.it;
+  return (dict && dict[key]) || (I18N.it && I18N.it[key]) || key;
 }
 
 function setLanguage(lang) {
-  if (!I18N[lang]) return;
-  currentLang = lang;
+  if (!I18N[lang]) lang = 'it';
   localStorage.setItem('yuma_lang', lang);
-  document.documentElement.lang = lang;
-  applyTranslations();
-  // update flag active state
-  document.querySelectorAll('.lang-btn').forEach(function(btn) {
-    var active = btn.getAttribute('data-lang') === lang;
-    btn.classList.toggle('ring-2', active);
-    btn.classList.toggle('ring-sky-400', active);
-    btn.classList.toggle('opacity-100', active);
-    btn.classList.toggle('opacity-50', !active);
-  });
-}
-
-function applyTranslations() {
-  document.querySelectorAll('[data-i18n]').forEach(function(el) {
+  document.querySelectorAll('[data-i18n]').forEach(function (el) {
     var key = el.getAttribute('data-i18n');
-    if (!key) return;
     var val = t(key);
-    if (el.tagName === 'INPUT' || el.tagName === 'TEXTAREA') {
-      if (el.hasAttribute('placeholder')) el.placeholder = val;
-      else el.value = val;
-    } else {
-      el.textContent = val;
-    }
+    if (val) el.textContent = val;
   });
-  document.querySelectorAll('[data-i18n-placeholder]').forEach(function(el) {
-    el.placeholder = t(el.getAttribute('data-i18n-placeholder'));
+  document.querySelectorAll('[data-i18n-placeholder]').forEach(function (el) {
+    var key = el.getAttribute('data-i18n-placeholder');
+    var val = t(key);
+    if (val) el.setAttribute('placeholder', val);
   });
-  // re-render dynamic parts if visible
-  if (typeof renderAreaMembri === 'function' && currentUser && userProfile) {
+  document.querySelectorAll('.lang-btn').forEach(function (btn) {
+    btn.classList.toggle('ring-2', btn.getAttribute('data-lang') === lang);
+  });
+  if (typeof renderRoster === 'function') renderRoster();
+  if (typeof renderAreaSoci === 'function') {
+    var soci = document.getElementById('area-soci');
+    if (soci && !soci.classList.contains('hidden')) renderAreaSoci();
+  }
+  if (typeof renderAreaYuma === 'function') {
+    var yuma = document.getElementById('area-yuma') || document.getElementById('area-membri');
+    if (yuma && !yuma.classList.contains('hidden')) renderAreaYuma();
+  }
+  if (typeof renderAreaMembri === 'function') {
     var area = document.getElementById('area-membri');
     if (area && !area.classList.contains('hidden')) renderAreaMembri();
   }
 }
-
 
 function injectLangSwitcher() {
   if (document.getElementById('yumaLangSwitcher')) return;
@@ -477,7 +482,6 @@ function injectLangSwitcher() {
     document.head.appendChild(style);
   }
 
-  // Remove any leftover HTML flag groups to avoid duplicates
   document.querySelectorAll('.lang-switcher').forEach(function(el) {
     if (el.id !== 'yumaLangSwitcher') el.remove();
   });
